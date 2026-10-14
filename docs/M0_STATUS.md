@@ -41,3 +41,5 @@ Do not close M0 or start M1 before all exit criteria are supported by evidence.
 ## Native checks become mandatory
 
 The separate native shell CI is being consolidated into the protected `verify` gate. In addition to Rust/Python/security checks, `verify` must require Windows WinUI build and real C#->Rust PInvoke smoke, plus macOS ARM64 and Intel SwiftUI/AppKit build and Swift->Rust smoke. This is compile-and-interop evidence, not visual UI/UX acceptance (#6 remains open).
+
+- PR #13 (`4a90cd6e`) merged: research-only checks of DATA/MNFT/INDX frame header, fixed-length/CRC32C and resource bounds. `.oha` wire format remains UNAPPROVED; issue #5 open.

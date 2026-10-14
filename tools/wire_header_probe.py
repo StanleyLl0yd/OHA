@@ -74,3 +74,55 @@ def validate_footer(footer: bytes, archive_bytes: int) -> dict[str, int]:
     return {"archive_bytes": archive_bytes, "manifest_at": manifest_at,
             "manifest_bytes": manifest_bytes, "index_at": index_at,
             "index_bytes": index_bytes, "generation": generation}
+
+# Research-only frame header limits. A final specification may set different limits.
+RESEARCH_MAX_FRAME_PAYLOAD = 18 * 1024 * 1024
+RESEARCH_MAX_FRAME_DECODED = 16 * 1024 * 1024
+FRAME_KINDS = (b"DATA", b"MNFT", b"INDX")
+
+
+def validate_frame_header(
+    raw: bytes,
+    *,
+    max_payload_bytes: int = RESEARCH_MAX_FRAME_PAYLOAD,
+    max_decoded_bytes: int = RESEARCH_MAX_FRAME_DECODED,
+) -> dict[str, int | str]:
+    """Validate only a proposed 80-byte frame header, not its body or archive.
+
+    Caller-provided resource ceilings are mandatory for any production decoder.
+    This is a structural research probe; no SHA-256 or decompression is performed.
+    """
+    if len(raw) != FRAME_HEADER_BYTES:
+        raise ProposalFormatError("frame header size")
+    if max_payload_bytes < 0 or max_decoded_bytes < 0:
+        raise ValueError("negative frame budget")
+    kind = raw[:4]
+    if kind not in FRAME_KINDS:
+        raise ProposalFormatError("unknown frame kind")
+    header_len, version, flags, payload, decoded, block_id, codec, params = (
+        struct.unpack_from("<HHIQQQHH", raw, 4)
+    )
+    if header_len != FRAME_HEADER_BYTES or version != 1:
+        raise ProposalFormatError("frame header size/version")
+    if flags != 0 or params != 0 or any(raw[76:80]):
+        raise ProposalFormatError("unknown frame flags, parameters or reserved fields")
+    if payload > max_payload_bytes or decoded > max_decoded_bytes:
+        raise ProposalFormatError("frame resource limit")
+    if crc32c(raw[:72]) != struct.unpack_from("<I", raw, 72)[0]:
+        raise ProposalFormatError("frame CRC32C mismatch")
+    if kind == b"DATA":
+        if block_id == 0 or codec not in (0, 1):
+            raise ProposalFormatError("invalid DATA block id or codec")
+        if codec == 0 and payload != decoded:
+            raise ProposalFormatError("STORE DATA length mismatch")
+        if codec == 1 and payload == 0:
+            raise ProposalFormatError("empty ZSTD payload")
+    elif block_id != 0 or codec != 0 or payload != decoded:
+        raise ProposalFormatError("invalid metadata block id, codec or lengths")
+    return {
+        "kind": kind.decode("ascii"),
+        "payload_bytes": payload,
+        "decoded_bytes": decoded,
+        "block_id": block_id,
+        "codec": codec,
+    }

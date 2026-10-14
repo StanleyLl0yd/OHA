@@ -82,3 +82,7 @@ Range checks precede all reads. MNFT must end at or before INDX, INDX ends exact
 ## 5. Research verification
 
 `tools/wire_header_probe.py` checks only header/footer structure and CRC32C without writing archives. `tests/test_wire_header_probe.py` includes the independently specified CRC32C standard vector and negative bounds, endian, version and corruption cases. The fixed research examples in `research/wire-v1-framing-vectors.json` are only framing examples, **not valid full archives or independent end-to-end vectors**. **A passing test is not archive-conformance or security certification.**
+
+## M0 80-byte frame header research checks
+
+The **unapproved** `DATA`, `MNFT`, and `INDX` frame proposal now has a read-only `validate_frame_header()` negative-test suite in `tools/wire_header_probe.py` and `tests/test_wire_header_probe.py`. It rejects unknown frame kinds, versions, flags, codecs, invalid block IDs, CRC32C corruption, declared size inconsistencies and over-budget frame lengths. The bounded default research limits are 16 MiB decoded and 18 MiB encoded bytes, each caller-overridable by a stricter budget; they are **not accepted public wire limits**. Hash verification, manifest/index serialization, compressed body validation, archive consistency and safe extraction remain unimplemented. No `.oha` writer or decoding claim follows from these tests.

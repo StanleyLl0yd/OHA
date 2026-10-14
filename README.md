@@ -85,3 +85,5 @@ See [`docs/ROADMAP.md`](docs/ROADMAP.md) for acceptance criteria and unresolved 
 ## Native and security verification
 
 The GitHub `verify` check is a fail-closed merge gate for Rust/Python tests, Semgrep, Gitleaks, Dependency Review (on PRs) and native WinUI/SwiftUI builds plus cross-language smoke tests. CodeQL scans Rust, Python, Actions, C# and Swift separately. `.oha` serialization and archive extraction are still unimplemented, and M0 exit requires the complete documented audit.
+
+- Proposed `.oha` DATA/MNFT/INDX 80-byte frame-header research validations were added by PR #13; the format is unapproved and no archive writer or decoder exists.
