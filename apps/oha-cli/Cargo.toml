@@ -1,0 +1,15 @@
+[package]
+name = "oha-cli"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[[bin]]
+name = "oha-archiver"
+path = "src/main.rs"
+
+[dependencies]
+oha-analysis = { path = "../../crates/oha-analysis" }
+
+[lints]
+workspace = true

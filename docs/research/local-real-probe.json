@@ -1,0 +1,1059 @@
+{
+  "schema_version": 1,
+  "kind": "compression_probe_NOT_archive_benchmark",
+  "notes": "Synthetic or arbitrary per-file samples. No archive metadata/solid grouping/peak RSS/cache normalization; avoid cross-machine comparisons.",
+  "repetitions": 3,
+  "environment": {
+    "system": "Linux",
+    "release": "6.18.44",
+    "machine": "x86_64",
+    "python": "3.13.5"
+  },
+  "limits": {
+    "max_files": 1000,
+    "max_file_bytes": 16777216,
+    "max_scan_entries": 100000,
+    "max_total_bytes": 67108864
+  },
+  "tool_versions": {
+    "zstd": "*** Zstandard CLI (64-bit) v1.5.7, by Yann Collet ***",
+    "xz": "xz (XZ Utils) 5.8.1"
+  },
+  "files": [
+    {
+      "path": "01-license-text.txt",
+      "input_bytes": 35149,
+      "input_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "measurements": [
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 35149,
+          "encode_ms": 0.062,
+          "decode_ms": 0.036,
+          "roundtrip_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 35149,
+          "encode_ms": 0.095,
+          "decode_ms": 0.043,
+          "roundtrip_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 35149,
+          "encode_ms": 0.882,
+          "decode_ms": 1.556,
+          "roundtrip_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 12616,
+          "encode_ms": 5.891,
+          "decode_ms": 2.899,
+          "roundtrip_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 12616,
+          "encode_ms": 5.357,
+          "decode_ms": 1.862,
+          "roundtrip_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 12616,
+          "encode_ms": 2.14,
+          "decode_ms": 1.825,
+          "roundtrip_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 11991,
+          "encode_ms": 5.384,
+          "decode_ms": 1.91,
+          "roundtrip_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 11991,
+          "encode_ms": 5.861,
+          "decode_ms": 1.993,
+          "roundtrip_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 11991,
+          "encode_ms": 7.53,
+          "decode_ms": 1.61,
+          "roundtrip_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 12000,
+          "encode_ms": 7.609,
+          "decode_ms": 2.952,
+          "roundtrip_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 12000,
+          "encode_ms": 7.703,
+          "decode_ms": 1.593,
+          "roundtrip_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 12000,
+          "encode_ms": 7.598,
+          "decode_ms": 1.675,
+          "roundtrip_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        }
+      ]
+    },
+    {
+      "path": "02-config-schema.json",
+      "input_bytes": 119558,
+      "input_sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5",
+      "measurements": [
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 119558,
+          "encode_ms": 0.133,
+          "decode_ms": 0.061,
+          "roundtrip_sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 119558,
+          "encode_ms": 0.165,
+          "decode_ms": 0.066,
+          "roundtrip_sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 119558,
+          "encode_ms": 0.138,
+          "decode_ms": 0.19,
+          "roundtrip_sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 10883,
+          "encode_ms": 4.153,
+          "decode_ms": 1.948,
+          "roundtrip_sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 10883,
+          "encode_ms": 1.99,
+          "decode_ms": 1.678,
+          "roundtrip_sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 10883,
+          "encode_ms": 1.931,
+          "decode_ms": 1.671,
+          "roundtrip_sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 8849,
+          "encode_ms": 6.252,
+          "decode_ms": 1.774,
+          "roundtrip_sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 8849,
+          "encode_ms": 6.246,
+          "decode_ms": 1.755,
+          "roundtrip_sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 8849,
+          "encode_ms": 5.368,
+          "decode_ms": 1.609,
+          "roundtrip_sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 8700,
+          "encode_ms": 8.599,
+          "decode_ms": 3.05,
+          "roundtrip_sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 8700,
+          "encode_ms": 7.7,
+          "decode_ms": 1.391,
+          "roundtrip_sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 8700,
+          "encode_ms": 7.732,
+          "decode_ms": 2.622,
+          "roundtrip_sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+        }
+      ]
+    },
+    {
+      "path": "03-iso-data.json",
+      "input_bytes": 874782,
+      "input_sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda",
+      "measurements": [
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 874782,
+          "encode_ms": 0.146,
+          "decode_ms": 0.212,
+          "roundtrip_sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 874782,
+          "encode_ms": 0.245,
+          "decode_ms": 0.145,
+          "roundtrip_sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 874782,
+          "encode_ms": 0.143,
+          "decode_ms": 2.799,
+          "roundtrip_sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 96641,
+          "encode_ms": 6.599,
+          "decode_ms": 2.405,
+          "roundtrip_sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 96641,
+          "encode_ms": 18.851,
+          "decode_ms": 2.724,
+          "roundtrip_sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 96641,
+          "encode_ms": 3.966,
+          "decode_ms": 2.733,
+          "roundtrip_sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 78835,
+          "encode_ms": 34.484,
+          "decode_ms": 2.775,
+          "roundtrip_sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 78835,
+          "encode_ms": 13.601,
+          "decode_ms": 2.561,
+          "roundtrip_sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 78835,
+          "encode_ms": 15.464,
+          "decode_ms": 2.882,
+          "roundtrip_sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 74576,
+          "encode_ms": 98.736,
+          "decode_ms": 8.52,
+          "roundtrip_sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 74576,
+          "encode_ms": 68.841,
+          "decode_ms": 13.037,
+          "roundtrip_sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 74576,
+          "encode_ms": 59.149,
+          "decode_ms": 5.809,
+          "roundtrip_sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+        }
+      ]
+    },
+    {
+      "path": "04-elf-grep.bin",
+      "input_bytes": 203152,
+      "input_sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb",
+      "measurements": [
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 203152,
+          "encode_ms": 0.106,
+          "decode_ms": 0.061,
+          "roundtrip_sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 203152,
+          "encode_ms": 0.119,
+          "decode_ms": 0.076,
+          "roundtrip_sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 203152,
+          "encode_ms": 0.353,
+          "decode_ms": 0.104,
+          "roundtrip_sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 101679,
+          "encode_ms": 17.591,
+          "decode_ms": 3.226,
+          "roundtrip_sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 101679,
+          "encode_ms": 4.608,
+          "decode_ms": 2.569,
+          "roundtrip_sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 101679,
+          "encode_ms": 3.946,
+          "decode_ms": 2.119,
+          "roundtrip_sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 98122,
+          "encode_ms": 12.341,
+          "decode_ms": 2.641,
+          "roundtrip_sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 98122,
+          "encode_ms": 12.536,
+          "decode_ms": 2.35,
+          "roundtrip_sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 98122,
+          "encode_ms": 8.912,
+          "decode_ms": 4.322,
+          "roundtrip_sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 85532,
+          "encode_ms": 31.314,
+          "decode_ms": 5.193,
+          "roundtrip_sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 85532,
+          "encode_ms": 51.978,
+          "decode_ms": 7.573,
+          "roundtrip_sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 85532,
+          "encode_ms": 39.199,
+          "decode_ms": 5.214,
+          "roundtrip_sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+        }
+      ]
+    },
+    {
+      "path": "05-elf-libcrypto.bin",
+      "input_bytes": 6513216,
+      "input_sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c",
+      "measurements": [
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 6513216,
+          "encode_ms": 1.083,
+          "decode_ms": 1.101,
+          "roundtrip_sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 6513216,
+          "encode_ms": 1.243,
+          "decode_ms": 1.224,
+          "roundtrip_sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 6513216,
+          "encode_ms": 2.885,
+          "decode_ms": 5.234,
+          "roundtrip_sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 2306563,
+          "encode_ms": 42.369,
+          "decode_ms": 13.211,
+          "roundtrip_sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 2306563,
+          "encode_ms": 40.046,
+          "decode_ms": 12.343,
+          "roundtrip_sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 2306563,
+          "encode_ms": 35.382,
+          "decode_ms": 11.282,
+          "roundtrip_sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 2151484,
+          "encode_ms": 123.453,
+          "decode_ms": 13.987,
+          "roundtrip_sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 2151484,
+          "encode_ms": 139.106,
+          "decode_ms": 13.042,
+          "roundtrip_sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 2151484,
+          "encode_ms": 145.947,
+          "decode_ms": 25.669,
+          "roundtrip_sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 1888552,
+          "encode_ms": 1120.845,
+          "decode_ms": 62.469,
+          "roundtrip_sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 1888552,
+          "encode_ms": 1077.919,
+          "decode_ms": 68.858,
+          "roundtrip_sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 1888552,
+          "encode_ms": 986.883,
+          "decode_ms": 77.773,
+          "roundtrip_sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+        }
+      ]
+    },
+    {
+      "path": "06-image-png.png",
+      "input_bytes": 51312,
+      "input_sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247",
+      "measurements": [
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 51312,
+          "encode_ms": 0.102,
+          "decode_ms": 0.083,
+          "roundtrip_sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 51312,
+          "encode_ms": 0.113,
+          "decode_ms": 0.049,
+          "roundtrip_sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 51312,
+          "encode_ms": 0.221,
+          "decode_ms": 0.256,
+          "roundtrip_sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 42600,
+          "encode_ms": 3.001,
+          "decode_ms": 1.818,
+          "roundtrip_sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 42600,
+          "encode_ms": 2.186,
+          "decode_ms": 1.824,
+          "roundtrip_sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 42600,
+          "encode_ms": 2.021,
+          "decode_ms": 1.757,
+          "roundtrip_sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 41882,
+          "encode_ms": 5.741,
+          "decode_ms": 3.268,
+          "roundtrip_sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 41882,
+          "encode_ms": 6.833,
+          "decode_ms": 2.207,
+          "roundtrip_sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 41882,
+          "encode_ms": 5.704,
+          "decode_ms": 1.479,
+          "roundtrip_sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 40592,
+          "encode_ms": 11.424,
+          "decode_ms": 3.745,
+          "roundtrip_sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 40592,
+          "encode_ms": 18.14,
+          "decode_ms": 2.36,
+          "roundtrip_sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 40592,
+          "encode_ms": 10.783,
+          "decode_ms": 3.666,
+          "roundtrip_sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+        }
+      ]
+    },
+    {
+      "path": "07-image-jpeg.jpg",
+      "input_bytes": 292349,
+      "input_sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be",
+      "measurements": [
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 292349,
+          "encode_ms": 0.208,
+          "decode_ms": 0.085,
+          "roundtrip_sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 292349,
+          "encode_ms": 0.121,
+          "decode_ms": 0.088,
+          "roundtrip_sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 292349,
+          "encode_ms": 0.109,
+          "decode_ms": 0.126,
+          "roundtrip_sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 274628,
+          "encode_ms": 3.8,
+          "decode_ms": 1.827,
+          "roundtrip_sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 274628,
+          "encode_ms": 3.545,
+          "decode_ms": 1.654,
+          "roundtrip_sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 274628,
+          "encode_ms": 4.439,
+          "decode_ms": 1.607,
+          "roundtrip_sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 273043,
+          "encode_ms": 10.862,
+          "decode_ms": 1.924,
+          "roundtrip_sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 273043,
+          "encode_ms": 13.635,
+          "decode_ms": 2.067,
+          "roundtrip_sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 273043,
+          "encode_ms": 10.131,
+          "decode_ms": 1.939,
+          "roundtrip_sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 269260,
+          "encode_ms": 61.957,
+          "decode_ms": 9.175,
+          "roundtrip_sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 269260,
+          "encode_ms": 47.823,
+          "decode_ms": 8.632,
+          "roundtrip_sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 269260,
+          "encode_ms": 50.924,
+          "decode_ms": 9.158,
+          "roundtrip_sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+        }
+      ]
+    },
+    {
+      "path": "08-pdf.pdf",
+      "input_bytes": 2278676,
+      "input_sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87",
+      "measurements": [
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 2278676,
+          "encode_ms": 0.539,
+          "decode_ms": 0.488,
+          "roundtrip_sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 2278676,
+          "encode_ms": 0.446,
+          "decode_ms": 0.341,
+          "roundtrip_sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 2278676,
+          "encode_ms": 0.628,
+          "decode_ms": 0.354,
+          "roundtrip_sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 1647526,
+          "encode_ms": 10.552,
+          "decode_ms": 3.808,
+          "roundtrip_sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 1647526,
+          "encode_ms": 9.362,
+          "decode_ms": 16.247,
+          "roundtrip_sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 1647526,
+          "encode_ms": 10.675,
+          "decode_ms": 4.67,
+          "roundtrip_sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 1618936,
+          "encode_ms": 46.604,
+          "decode_ms": 4.053,
+          "roundtrip_sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 1618936,
+          "encode_ms": 40.508,
+          "decode_ms": 4.744,
+          "roundtrip_sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 1618936,
+          "encode_ms": 35.401,
+          "decode_ms": 7.014,
+          "roundtrip_sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 1615032,
+          "encode_ms": 438.462,
+          "decode_ms": 40.192,
+          "roundtrip_sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 1615032,
+          "encode_ms": 410.417,
+          "decode_ms": 40.852,
+          "roundtrip_sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 1615032,
+          "encode_ms": 465.628,
+          "decode_ms": 37.25,
+          "roundtrip_sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+        }
+      ]
+    },
+    {
+      "path": "09-zip.zip",
+      "input_bytes": 39142,
+      "input_sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd",
+      "measurements": [
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 39142,
+          "encode_ms": 0.052,
+          "decode_ms": 0.033,
+          "roundtrip_sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 39142,
+          "encode_ms": 0.064,
+          "decode_ms": 0.061,
+          "roundtrip_sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+        },
+        {
+          "codec": "STORE",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 39142,
+          "encode_ms": 0.82,
+          "decode_ms": 0.152,
+          "roundtrip_sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 36391,
+          "encode_ms": 2.602,
+          "decode_ms": 1.619,
+          "roundtrip_sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 36391,
+          "encode_ms": 1.968,
+          "decode_ms": 1.629,
+          "roundtrip_sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+        },
+        {
+          "codec": "ZSTD-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 36391,
+          "encode_ms": 1.854,
+          "decode_ms": 1.28,
+          "roundtrip_sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 36337,
+          "encode_ms": 4.798,
+          "decode_ms": 1.548,
+          "roundtrip_sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 36337,
+          "encode_ms": 6.156,
+          "decode_ms": 1.799,
+          "roundtrip_sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+        },
+        {
+          "codec": "ZSTD-9",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 36337,
+          "encode_ms": 5.118,
+          "decode_ms": 1.791,
+          "roundtrip_sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 1,
+          "encoded_bytes": 36724,
+          "encode_ms": 10.673,
+          "decode_ms": 2.207,
+          "roundtrip_sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 2,
+          "encoded_bytes": 36724,
+          "encode_ms": 12.199,
+          "decode_ms": 2.207,
+          "roundtrip_sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+        },
+        {
+          "codec": "XZ-3",
+          "status": "ok",
+          "repetition": 3,
+          "encoded_bytes": 36724,
+          "encode_ms": 10.057,
+          "decode_ms": 3.025,
+          "roundtrip_sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+        }
+      ]
+    }
+  ]
+}
