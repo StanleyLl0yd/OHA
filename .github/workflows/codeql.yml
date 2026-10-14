@@ -67,6 +67,8 @@ jobs:
       - name: Build Rust native library
         run: cargo build -p oha-ffi --locked
       - name: Build native Swift UI for analysis
+        env:
+          SWIFT_USE_INTEGRATED_DRIVER: 'NO'
         run: swiftc -parse-as-library -import-objc-header include/oha_ffi.h -L target/debug -loha_ffi apps/oha-macos/OHAApp.swift -o "$RUNNER_TEMP/OHA-CodeQL"
       - name: Analyze Swift
         uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
