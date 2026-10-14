@@ -28,3 +28,7 @@ Nine real locally installed file samples measured with STORE, ZSTD-3, ZSTD-9 and
 The bench harness now records input SHA-256, runtime environment and explicit scan/file/total byte limits, and rejects an explicitly empty codec list. The script does not follow input symlinks while discovering corpus files.
 
 `tools/baseline_tar.py` separately generates a deterministic TAR for a whole directory, compresses via external ZSTD or XZ and checks reconstructed TAR plus every member SHA-256. See `research/local-real-tar-baseline.json`. It counts TAR packaging and compression but still lacks random-file retrieval, full scan cost, and memory profiling, and is **not** a 7-Zip baseline.
+
+## Independent `.7z` LZMA2 benchmark harness (in validation)
+
+`tools/baseline_7z.py`, described in `docs/BENCHMARK_7Z_M0.md`, uses a real 7-Zip CLI rather than claiming that TAR+XZ is equivalent to 7z. It measures full `.7z` creation, full SHA-256-verified restoration, selective extraction with SHA-256 verification and GNU-time process RSS when available. A separate PR CI workflow installs 7-Zip and records raw artifacts for a small repository text corpus. This is a **tool-validation smoke corpus**, not a performance holdout or OHA comparison. Issue #3 remains open for representative corpora and complete controlled analyses.

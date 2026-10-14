@@ -1,0 +1,51 @@
+name: M0 Independent 7-Zip Benchmark
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "41 5 * * 1"
+
+permissions: {}
+
+concurrency:
+  group: 7z-benchmark-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  baseline:
+    name: 7z LZMA2 archive and selective extraction
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check pinned workflow dependencies
+        run: python3 scripts/verify_ci_supply_chain.py
+      - name: Install independent 7-Zip CLI
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq 7zip
+          7z i | head -n 5
+      - name: Run real decoder regression tests
+        run: python3 -m unittest discover -s tests -p 'test_baseline_7z.py' -v
+      - name: Measure repository text corpus with independent 7-Zip
+        run: |
+          python3 tools/baseline_7z.py docs --output "$RUNNER_TEMP/oha-7z-results.json" --repetitions 2
+          python3 tools/baseline_tar.py docs --output "$RUNNER_TEMP/oha-tar-results.json" --repetitions 2
+      - name: Publish raw reproducibility results
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: oha-m0-independent-archive-benchmarks-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/oha-7z-results.json
+            ${{ runner.temp }}/oha-tar-results.json
+          if-no-files-found: error
+          retention-days: 30
