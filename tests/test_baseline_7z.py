@@ -54,6 +54,15 @@ class Baseline7ZipTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "missing"):
                 base.verify_extract(root, expected)
 
+
+    def test_version_banner_skips_leading_blank_lines(self):
+        self.assertEqual(
+            base.version_banner("\n\n7-Zip (a) 24.09\nMore information\n"),
+            "7-Zip (a) 24.09",
+        )
+        with self.assertRaisesRegex(RuntimeError, "version"):
+            base.version_banner(" \n\t\n")
+
     def test_empty_input_and_invalid_parameters(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)

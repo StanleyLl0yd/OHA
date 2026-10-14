@@ -73,6 +73,15 @@ def timed_run(args: list[str], cwd: Path, timeout: int, capture_stdout: bool = F
                 "stdout": completed.stdout if capture_stdout else None}
 
 
+
+def version_banner(output: str) -> str:
+    for line in output.splitlines():
+        cleaned = line.strip()
+        if cleaned:
+            return cleaned[:250]
+    raise RuntimeError("7-Zip returned no identifiable version text")
+
+
 def measure(root: Path, files: list[Path], *, sevenzip: str, repetitions: int = 3,
             solid_options: tuple[bool, ...] = (False, True), timeout: int = 600) -> dict:
     if repetitions < 1 or repetitions > 20 or timeout < 1 or timeout > 3600 or not solid_options:
@@ -130,7 +139,7 @@ def measure(root: Path, files: list[Path], *, sevenzip: str, repetitions: int = 
                             "integrity": "all files and selective SHA-256 verified"})
     return {"schema_version": 1, "kind": "independent_7zip_LZMA2_archive_baseline_NOT_OHA",
             "tool": sevenzip,
-            "version": (version.stdout or version.stderr).splitlines()[0][:250],
+            "version": version_banner(version.stdout + "\n" + version.stderr),
             "environment": {"os": platform.platform(), "python": platform.python_version(),
                             "machine": platform.machine(), "gnu_time_rss": sys.platform.startswith("linux") and Path("/usr/bin/time").exists()},
             "method": {"archive": "7z", "codec": "LZMA2", "level": 5, "threads": 1,

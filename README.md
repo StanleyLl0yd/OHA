@@ -1,5 +1,7 @@
 # OHA - Optimized Hybrid Archiver
 
+**License:** [Mozilla Public License Version 2.0 (MPL-2.0)](LICENSE). Both commercial and noncommercial uses are permitted under MPL-2.0, with its source and notice obligations.
+
 **Status:** M0 architecture / research. **This is not yet a usable archiver.**
 
 OHA is an offline, cross-platform hybrid data archiver designed to choose suitable lossless codecs, grouping, dictionaries and deduplication strategies for individual datasets while respecting compression time, decompression time and memory budgets.
@@ -66,7 +68,7 @@ python3 tools/benchmark.py ./sample-corpus --output ./bench-results.json --repet
 
 ## Important decisions that remain open
 
-- Public-source license: **not chosen**. Do not assume an open-source license is granted by this distribution or add one without owner approval.
+- OHA's original source code is licensed under **MPL-2.0**, with file-level copyleft and attribution/notice requirements when distributing covered modifications; third-party library licenses remain separate.
 - `.oha` binary wire specification: **draft constraints only**. No backwards-compatibility promises yet.
 - Codec dependencies: STORE + ZSTD first; LZMA2, BZip3 and LZ4 only after legal and cross-platform assessment.
 - BLAKE3 and FastCDC for M3, after M1/M2 reliability requirements are satisfied.
@@ -79,7 +81,7 @@ See [`docs/ROADMAP.md`](docs/ROADMAP.md) for acceptance criteria and unresolved 
 
 - Exploratory local real-file measurements: `docs/research/REAL_PROBE_RESULTS.md` (no OHA vs 7-Zip claim).
 - **Unapproved** candidate binary framing: `docs/FORMAT_V1_PROPOSAL.md` and read-only `tools/wire_header_probe.py`. This is not a working `.oha` implementation.
-- Candidate dependency licensing research: `docs/LICENSING_RESEARCH.md`. No distribution LICENSE selected.
+- OHA project source license is MPL-2.0, governed by root `LICENSE`. Details: `CONTRIBUTING.md`, `AUTHORS.md`, `THIRD_PARTY_NOTICES.md` and `docs/LICENSING_RESEARCH.md`.
 - Toolchain pin: `rust-toolchain.toml` (1.89.0); Cargo cannot be built in the current authoring environment and requires CI verification.
 
 ## Native and security verification
@@ -87,3 +89,9 @@ See [`docs/ROADMAP.md`](docs/ROADMAP.md) for acceptance criteria and unresolved 
 The GitHub `verify` check is a fail-closed merge gate for Rust/Python tests, Semgrep, Gitleaks, Dependency Review (on PRs) and native WinUI/SwiftUI builds plus cross-language smoke tests. CodeQL scans Rust, Python, Actions, C# and Swift separately. `.oha` serialization and archive extraction are still unimplemented, and M0 exit requires the complete documented audit.
 
 - Proposed `.oha` DATA/MNFT/INDX 80-byte frame-header research validations were added by PR #13; the format is unapproved and no archive writer or decoder exists.
+
+## License, authors and binary recipients
+
+Original OHA source is released under [Mozilla Public License 2.0](LICENSE). Initial project maintainer: [StanleyLl0yd](https://github.com/StanleyLl0yd), with contributors credited in Git history. Copyright and license notices must be preserved. Distributing modified MPL-covered code requires making the corresponding covered source available under MPL-2.0. Private, including internal commercial use, need not publish modifications. A fee is **not** required for commercial use under MPL.
+
+Source availability: https://github.com/StanleyLl0yd/OHA. Third-party runtimes, native codec libraries, bundled binary dependencies and benchmark data are **not relicensed** by OHA's MPL. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [docs/PREVIEW_M0.md](docs/PREVIEW_M0.md). Previews remain research-only and do not indicate completed redistribution clearance.
