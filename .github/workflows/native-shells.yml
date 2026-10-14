@@ -1,0 +1,65 @@
+name: M0 Native UI Shells
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: native-shells-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  winui:
+    name: Windows WinUI 3 native build
+    runs-on: windows-2022
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check supply-chain policy
+        shell: pwsh
+        run: python scripts/verify_ci_supply_chain.py
+      - name: Install Rust toolchain
+        shell: pwsh
+        run: rustup toolchain install 1.89.0 --profile minimal
+      - name: Build Rust native library
+        shell: pwsh
+        run: cargo build -p oha-ffi --locked
+      - name: Build WinUI 3 C# application without launching
+        shell: pwsh
+        run: dotnet build apps/oha-windows/OHA.Windows.csproj -c Release -p:Platform=x64 -p:RuntimeIdentifier=win-x64
+
+  swiftui:
+    name: macOS SwiftUI/AppKit native build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-15-intel]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check supply-chain policy
+        run: python3 scripts/verify_ci_supply_chain.py
+      - name: Install Rust toolchain
+        run: rustup toolchain install 1.89.0 --profile minimal
+      - name: Build Rust native library
+        run: cargo build -p oha-ffi --locked
+      - name: Compile SwiftUI/AppKit native application
+        run: swiftc -parse-as-library -import-objc-header include/oha_ffi.h -L target/debug -loha_ffi apps/oha-macos/OHAApp.swift -o "$RUNNER_TEMP/OHA"
+      - name: Compile and execute Swift foreign-caller smoke
+        run: |
+          swiftc -import-objc-header include/oha_ffi.h -L target/debug -loha_ffi apps/oha-macos/FFISmoke.swift -o "$RUNNER_TEMP/OHAFFISmoke"
+          DYLD_LIBRARY_PATH="$GITHUB_WORKSPACE/target/debug" "$RUNNER_TEMP/OHAFFISmoke"

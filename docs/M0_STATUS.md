@@ -32,3 +32,8 @@ Do not close M0 or start M1 before all exit criteria are supported by evidence.
 ## Next M0 benchmark work
 
 - Independent 7-Zip LZMA2 archive and selective-extraction harness prepared for CI validation. No representative performance claim or complete holdout corpus yet; #3 remains open.
+
+## Native UI M0 work
+
+- C ABI successfully verified via Rust and Python foreign caller on four OS runners (PR #10).
+- Minimal native Windows WinUI 3/C# and macOS SwiftUI/AppKit visual shells prepared for hosted compilation; see `docs/NATIVE_UI_M0.md`. No native user interaction or installation/signing validated yet (#6 remains open).
