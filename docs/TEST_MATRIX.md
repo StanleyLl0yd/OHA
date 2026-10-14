@@ -7,7 +7,7 @@
 | Linux x86_64 Rust CLI | cargo build | fmt, clippy, unit tests | Not required | CI PASS (PR #1) |
 | Windows x64 Rust CLI | cargo build | unit/FFI validation | WinUI prototype | Rust CI PASS; FFI/GUI pending |
 | macOS arm64 Rust CLI | cargo build | unit/FFI validation | SwiftUI/AppKit prototype | Rust CI PASS; FFI/GUI pending |
-| macOS x86_64 Rust CLI | cargo build | unit/FFI validation | Same universal app | Intel runner added; CI pending |
+| macOS x86_64 Rust CLI | cargo build | unit/FFI validation | Same universal app | Rust CI PASS; FFI smoke under review |
 | Windows ARM64 | Optional first release | Core tests where supported | Deferred official tier | Planned |
 | Linux ARM64 | Optional first release | Core tests where supported | Not required | Planned |
 

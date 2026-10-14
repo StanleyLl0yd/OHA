@@ -14,5 +14,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "oha-ffi"
+version = "0.0.0"
+dependencies = [
+ "oha-analysis",
+]
+
+[[package]]
 name = "oha-policy"
 version = "0.0.0"
