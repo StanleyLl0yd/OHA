@@ -131,14 +131,23 @@ mod tests {
     #[test]
     fn empty_and_text_and_binary() {
         let mut output = OhaAnalysisV1::default();
-        assert_eq!(unsafe { oha_analyze_bytes_v1(ptr::null(), 0, &mut output) }, OHA_OK);
+        assert_eq!(
+            unsafe { oha_analyze_bytes_v1(ptr::null(), 0, &mut output) },
+            OHA_OK
+        );
         assert_eq!(output.content_hint, 0);
         assert_eq!(output.sampled_bytes, 0);
         let text = b"hello from OHA\n";
-        assert_eq!(unsafe { oha_analyze_bytes_v1(text.as_ptr(), text.len() as u64, &mut output) }, OHA_OK);
+        assert_eq!(
+            unsafe { oha_analyze_bytes_v1(text.as_ptr(), text.len() as u64, &mut output) },
+            OHA_OK
+        );
         assert_eq!(output.content_hint, 1);
         let zeros = [0_u8; 100];
-        assert_eq!(unsafe { oha_analyze_bytes_v1(zeros.as_ptr(), zeros.len() as u64, &mut output) }, OHA_OK);
+        assert_eq!(
+            unsafe { oha_analyze_bytes_v1(zeros.as_ptr(), zeros.len() as u64, &mut output) },
+            OHA_OK
+        );
         assert_eq!(output.content_hint, 2);
         assert_eq!(output.reserved, [0, 0]);
     }
@@ -147,13 +156,28 @@ mod tests {
     fn invalid_metadata_and_pointers() {
         let mut output = OhaAnalysisV1::default();
         let bytes = b"xyz";
-        assert_eq!(unsafe { oha_analyze_bytes_v1(bytes.as_ptr(), 3, ptr::null_mut()) }, OHA_ERR_NULL_OUTPUT);
-        assert_eq!(unsafe { oha_analyze_bytes_v1(ptr::null(), 1, &mut output) }, OHA_ERR_NULL_INPUT);
-        assert_eq!(unsafe { oha_analyze_bytes_v1(ptr::null(), MAX_INPUT_BYTES + 1, &mut output) }, OHA_ERR_INPUT_TOO_LARGE);
+        assert_eq!(
+            unsafe { oha_analyze_bytes_v1(bytes.as_ptr(), 3, ptr::null_mut()) },
+            OHA_ERR_NULL_OUTPUT
+        );
+        assert_eq!(
+            unsafe { oha_analyze_bytes_v1(ptr::null(), 1, &mut output) },
+            OHA_ERR_NULL_INPUT
+        );
+        assert_eq!(
+            unsafe { oha_analyze_bytes_v1(ptr::null(), MAX_INPUT_BYTES + 1, &mut output) },
+            OHA_ERR_INPUT_TOO_LARGE
+        );
         output.version = 2;
-        assert_eq!(unsafe { oha_analyze_bytes_v1(bytes.as_ptr(), 3, &mut output) }, OHA_ERR_UNSUPPORTED_LAYOUT);
+        assert_eq!(
+            unsafe { oha_analyze_bytes_v1(bytes.as_ptr(), 3, &mut output) },
+            OHA_ERR_UNSUPPORTED_LAYOUT
+        );
         output.version = 1;
         output.struct_size = 1;
-        assert_eq!(unsafe { oha_analyze_bytes_v1(bytes.as_ptr(), 3, &mut output) }, OHA_ERR_UNSUPPORTED_LAYOUT);
+        assert_eq!(
+            unsafe { oha_analyze_bytes_v1(bytes.as_ptr(), 3, &mut output) },
+            OHA_ERR_UNSUPPORTED_LAYOUT
+        );
     }
 }
