@@ -2,7 +2,7 @@
 
 Windows: `apps/oha-windows`, an unpackaged WinUI 3 / C# shell referencing pinned Microsoft.WindowsAppSDK and SDK BuildTools packages. macOS: `apps/oha-macos/OHAApp.swift`, a SwiftUI view with AppKit linkage. Both display a simple OHA window and call the Rust `oha-ffi` analysis API on an in-memory UTF-8 sample when the user presses a button. Neither UI creates, lists, tests or extracts archives.
 
-The GitHub `M0 Native UI Shells` workflow builds the Windows application on Windows x64, compiles the SwiftUI application on macOS arm64 and Intel, and executes a real standalone Swift foreign-caller smoke on both. UI interaction, accessibility, packaging, signing, notarization, deployment prerequisites, main-thread responsiveness for long operations, progress/cancel, and native integration tests are not verified by compilation. Issue #6 remains open.
+The protected GitHub CI `verify` gate builds the Windows application on Windows x64, compiles the SwiftUI application on macOS arm64 and Intel, and executes a real standalone Swift foreign-caller smoke on both. Windows also executes a real C# PInvoke -> Rust foreign-caller probe using the exact interop structs linked into the WinUI application, and checks ABI mismatch errors. These native checks are mandatory dependencies of `verify`. UI interaction, accessibility, packaging, signing, notarization, deployment prerequisites, main-thread responsiveness for long operations, progress/cancel, and native integration tests are not verified by compilation. Issue #6 remains open.
 
 ## Running locally
 
@@ -13,3 +13,7 @@ macOS: build the Rust library (`cargo build -p oha-ffi --locked`), then use `swi
 A successful desktop CI build proves compilation/linkage only. No public FFI ABI or `.oha` format is frozen.
 
 For the SwiftUI shell, the repository root `Package.swift` defines a local Swift Package Manager executable and `include/module.modulemap` exports the canonical C ABI header as the `COHAFFI` module. Use `swift build -c release` after building Rust. This is an executable compilation probe rather than a packaged `.app`. The SwiftPM build is also traced by the CodeQL Swift job; direct `swiftc` foreign-caller smoke remains separate.
+
+### Test boundary
+
+The C# executable smoke runs on the Windows runner with the Rust DLL copied next to the test executable. It validates managed/native struct layout, function resolution, text-classification values and version-error handling without launching a graphical window. Because GUI code shares `NativeInterop.cs` with the smoke project, interop declarations cannot silently diverge. `verify` requires this job and both macOS native build/smoke runners; native CI is no longer a separate optional workflow. User-interactive GUI tests, runtime provisioning, distribution packaging and signing remain open (#6).

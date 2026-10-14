@@ -5,8 +5,8 @@
 | Target | Compile | Tests | GUI | Status |
 |---|---|---|---|---|
 | Linux x86_64 Rust CLI | cargo build | fmt, clippy, unit tests | Not required | CI PASS (PR #1) |
-| Windows x64 Rust CLI | cargo build | unit/FFI validation | WinUI prototype | Rust FFI CI PASS; WinUI shell compilation under test |
-| macOS arm64 Rust CLI | cargo build | unit/FFI validation | SwiftUI/AppKit prototype | Rust FFI CI PASS; SwiftUI/AppKit compilation under test |
+| Windows x64 Rust CLI | cargo build | unit/FFI validation | WinUI prototype | Rust FFI + WinUI CI PASS; C# PInvoke runtime smoke under CI validation |
+| macOS arm64 Rust CLI | cargo build | unit/FFI validation | SwiftUI/AppKit prototype | Rust FFI, SwiftUI/AppKit build and Swift foreign-caller smoke PASS |
 | macOS x86_64 Rust CLI | cargo build | unit/FFI validation | Same universal app | Rust FFI CI PASS; SwiftUI/AppKit compilation under test |
 | Windows ARM64 | Optional first release | Core tests where supported | Deferred official tier | Planned |
 | Linux ARM64 | Optional first release | Core tests where supported | Not required | Planned |

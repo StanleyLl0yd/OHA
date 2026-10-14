@@ -37,3 +37,7 @@ Do not close M0 or start M1 before all exit criteria are supported by evidence.
 
 - C ABI successfully verified via Rust and Python foreign caller on four OS runners (PR #10).
 - Minimal native Windows WinUI 3/C# and macOS SwiftUI/AppKit visual shells prepared for hosted compilation; see `docs/NATIVE_UI_M0.md`. No native user interaction or installation/signing validated yet (#6 remains open).
+
+## Native checks become mandatory
+
+The separate native shell CI is being consolidated into the protected `verify` gate. In addition to Rust/Python/security checks, `verify` must require Windows WinUI build and real C#->Rust PInvoke smoke, plus macOS ARM64 and Intel SwiftUI/AppKit build and Swift->Rust smoke. This is compile-and-interop evidence, not visual UI/UX acceptance (#6 remains open).

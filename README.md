@@ -26,6 +26,10 @@ The repository includes an early, dependency-free Rust analysis and codec-select
 apps/oha-cli/                  Experimental Rust CLI
 crates/oha-analysis/           Bounded byte-level sampling and metrics
 crates/oha-policy/             Testable selection policy and budgets
+crates/oha-ffi/                Experimental bounded C ABI analysis probe
+apps/oha-windows/              Native WinUI 3/C# prototype (Windows x64)
+apps/oha-macos/                Native SwiftUI/AppKit prototype (macOS)
+apps/oha-windows-ffi-smoke/    C# -> Rust PInvoke smoke
 docs/adr/                      Architecture decisions
 docs/ARCHITECTURE.md           Components, platform boundaries
 docs/FORMAT_DRAFT.md           Not-yet-frozen .oha format requirements
@@ -58,7 +62,7 @@ python3 tools/make_corpus.py --output ./sample-corpus
 python3 tools/benchmark.py ./sample-corpus --output ./bench-results.json --repetitions 3
 ```
 
-**Do not use synthetic corpus results to claim superiority over other archivers.** Real-world corpora, baseline 7-Zip, random extraction, RAM measurements, cold/warm cache repetitions and cross-platform compatibility tests are required before performance statements.
+**Do not use synthetic corpus results to claim superiority over other archivers.** An independent real 7-Zip LZMA2 research baseline is present; representative holdout corpora, controlled RSS and cold/warm repetitions, and an actual OHA writer are still required before performance claims.
 
 ## Important decisions that remain open
 
@@ -67,7 +71,7 @@ python3 tools/benchmark.py ./sample-corpus --output ./bench-results.json --repet
 - Codec dependencies: STORE + ZSTD first; LZMA2, BZip3 and LZ4 only after legal and cross-platform assessment.
 - BLAKE3 and FastCDC for M3, after M1/M2 reliability requirements are satisfied.
 - Security/crypto design: no home-grown cryptography; authenticated encryption added after threat model review.
-- Windows/macOS GUI prototypes: design fixed, executable GUI scaffolds not yet created or tested.
+- Windows/macOS GUI: native shells compile in CI and call the Rust experimental ABI; interactive operation, packaging and long-running jobs are not verified.
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for acceptance criteria and unresolved work.
 
@@ -77,3 +81,7 @@ See [`docs/ROADMAP.md`](docs/ROADMAP.md) for acceptance criteria and unresolved 
 - **Unapproved** candidate binary framing: `docs/FORMAT_V1_PROPOSAL.md` and read-only `tools/wire_header_probe.py`. This is not a working `.oha` implementation.
 - Candidate dependency licensing research: `docs/LICENSING_RESEARCH.md`. No distribution LICENSE selected.
 - Toolchain pin: `rust-toolchain.toml` (1.89.0); Cargo cannot be built in the current authoring environment and requires CI verification.
+
+## Native and security verification
+
+The GitHub `verify` check is a fail-closed merge gate for Rust/Python tests, Semgrep, Gitleaks, Dependency Review (on PRs) and native WinUI/SwiftUI builds plus cross-language smoke tests. CodeQL scans Rust, Python, Actions, C# and Swift separately. `.oha` serialization and archive extraction are still unimplemented, and M0 exit requires the complete documented audit.

@@ -119,10 +119,67 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           GITLEAKS_ENABLE_COMMENTS: 'false'
 
+  winui:
+    name: Windows WinUI 3 native build
+    runs-on: windows-2022
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check supply-chain policy
+        shell: pwsh
+        run: python scripts/verify_ci_supply_chain.py
+      - name: Install Rust toolchain
+        shell: pwsh
+        run: rustup toolchain install 1.89.0 --profile minimal
+      - name: Build Rust native library
+        shell: pwsh
+        run: cargo build -p oha-ffi --locked
+      - name: Build WinUI 3 C# application without launching
+        shell: pwsh
+        run: dotnet build apps/oha-windows/OHA.Windows.csproj -c Release -p:Platform=x64 -p:RuntimeIdentifier=win-x64
+      - name: Execute Windows C# to Rust PInvoke smoke
+        shell: pwsh
+        run: |
+          dotnet build apps/oha-windows-ffi-smoke/OHA.FFISmoke.csproj -c Release
+          $output = "apps/oha-windows-ffi-smoke/bin/Release/net10.0"
+          Copy-Item -LiteralPath "target/debug/oha_ffi.dll" -Destination (Join-Path $output "oha_ffi.dll") -Force
+          dotnet (Join-Path $output "OHA.FFISmoke.dll")
+
+  swiftui:
+    name: macOS SwiftUI/AppKit native build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-15-intel]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check supply-chain policy
+        run: python3 scripts/verify_ci_supply_chain.py
+      - name: Install Rust toolchain
+        run: rustup toolchain install 1.89.0 --profile minimal
+      - name: Build Rust native library
+        run: cargo build -p oha-ffi --locked
+      - name: Compile SwiftUI/AppKit native application
+        run: swift build -c release --build-path "$RUNNER_TEMP/oha-native-swift-build"
+      - name: Compile and execute Swift foreign-caller smoke
+        run: |
+          swiftc -import-objc-header include/oha_ffi.h -L target/debug -loha_ffi apps/oha-macos/FFISmoke.swift -o "$RUNNER_TEMP/OHAFFISmoke"
+          DYLD_LIBRARY_PATH="$GITHUB_WORKSPACE/target/debug" "$RUNNER_TEMP/OHAFFISmoke"
+
   verify:
     name: verify
     if: always()
-    needs: [rust, python, dependency-review, semgrep, gitleaks]
+    needs: [rust, python, dependency-review, semgrep, gitleaks, winui, swiftui]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions: {}
@@ -131,6 +188,8 @@ jobs:
         env:
           RUST_RESULT: ${{ needs.rust.result }}
           PYTHON_RESULT: ${{ needs.python.result }}
+          WINUI_RESULT: ${{ needs.winui.result }}
+          SWIFTUI_RESULT: ${{ needs.swiftui.result }}
           DEPENDENCY_REVIEW_RESULT: ${{ needs.dependency-review.result }}
           SEMGREP_RESULT: ${{ needs.semgrep.result }}
           GITLEAKS_RESULT: ${{ needs.gitleaks.result }}
@@ -139,6 +198,8 @@ jobs:
           set -euo pipefail
           test "$RUST_RESULT" = "success"
           test "$PYTHON_RESULT" = "success"
+          test "$WINUI_RESULT" = "success"
+          test "$SWIFTUI_RESULT" = "success"
           test "$SEMGREP_RESULT" = "success"
           test "$GITLEAKS_RESULT" = "success"
           if [[ "$EVENT_NAME" == "pull_request" ]]; then
