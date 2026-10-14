@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MPL-2.0
 //! Experimental, bounded OHA C ABI for native interface research (M0).
 //! This interface analyzes caller-provided memory only; it never creates archives.
 

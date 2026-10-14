@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MPL-2.0
 //! M0 research command. This deliberately does not create .oha archives.
 
 use std::env;
