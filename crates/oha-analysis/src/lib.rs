@@ -162,13 +162,15 @@ mod tests {
         assert_eq!(analyze_bytes(text.as_bytes()).hint, ContentHint::MostlyText);
     }
 
-
     #[test]
     fn valid_unicode_replacement_character_is_text() {
         // U+FFFD is a legitimate character, not proof of malformed UTF-8.
         let input = "\u{fffd}".repeat(500);
         assert_eq!(malformed_utf8_sequences(input.as_bytes()), 0);
-        assert_eq!(analyze_bytes(input.as_bytes()).hint, ContentHint::MostlyText);
+        assert_eq!(
+            analyze_bytes(input.as_bytes()).hint,
+            ContentHint::MostlyText
+        );
     }
 
     #[test]
