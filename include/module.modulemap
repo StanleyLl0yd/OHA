@@ -1,0 +1,4 @@
+module COHAFFI [system] {
+    header "oha_ffi.h"
+    export *
+}
