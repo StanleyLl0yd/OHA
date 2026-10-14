@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MPL-2.0
 """Minimal verified compression-probe harness (STORE, ZSTD, XZ).
 
 The results are per-file codec measurements, NOT comparable to finished 7z/OHA archives.

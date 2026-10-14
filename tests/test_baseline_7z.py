@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """Independent 7-Zip benchmark contract tests, actual baseline optional locally."""
 
 import importlib.util

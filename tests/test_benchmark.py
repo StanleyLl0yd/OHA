@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """Unit tests for the M0 Python research harness."""
 
 import importlib.util

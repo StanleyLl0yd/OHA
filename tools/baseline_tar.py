@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MPL-2.0
 """Deterministic tar+codec M0 baseline, NOT 7-Zip or OHA benchmarking."""
 
 from __future__ import annotations
