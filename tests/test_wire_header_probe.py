@@ -108,5 +108,125 @@ class WireCandidateTests(unittest.TestCase):
             wire.validate_footer(valid_footer()[:-1], 352)
 
 
+
+def candidate_frame(
+    *,
+    kind=b"DATA",
+    payload=64,
+    decoded=64,
+    block_id=1,
+    codec=0,
+    version=1,
+    length=80,
+    flags=0,
+    params=0,
+):
+    frame = bytearray(80)
+    frame[:4] = kind
+    struct.pack_into(
+        "<HHIQQQHH", frame, 4,
+        length, version, flags, payload, decoded, block_id, codec, params,
+    )
+    # Header SHA-256 is a stored field, not verified without decoded body bytes.
+    frame[40:72] = bytes(range(32))
+    struct.pack_into("<I", frame, 72, wire.crc32c(frame[:72]))
+    return bytes(frame)
+
+
+class FrameHeaderProposalTests(unittest.TestCase):
+    def test_regular_data_store(self):
+        self.assertEqual(wire.validate_frame_header(candidate_frame())["kind"], "DATA")
+
+    def test_zstd_length_may_differ(self):
+        result = wire.validate_frame_header(candidate_frame(payload=42, decoded=4096, codec=1))
+        self.assertEqual(result["decoded_bytes"], 4096)
+
+    def test_metadata_is_store_and_id_zero(self):
+        for kind in (b"MNFT", b"INDX"):
+            with self.subTest(kind=kind):
+                self.assertEqual(
+                    wire.validate_frame_header(
+                        candidate_frame(kind=kind, block_id=0)
+                    )["kind"],
+                    kind.decode(),
+                )
+
+    def test_truncated_or_extended_frame_rejected(self):
+        raw = candidate_frame()
+        for altered in (b"", raw[:-1], raw + b"\x00"):
+            with self.subTest(size=len(altered)):
+                with self.assertRaisesRegex(wire.ProposalFormatError, "size"):
+                    wire.validate_frame_header(altered)
+
+    def test_unknown_kind_rejected(self):
+        with self.assertRaisesRegex(wire.ProposalFormatError, "kind"):
+            wire.validate_frame_header(candidate_frame(kind=b"EVIL"))
+
+    def test_frame_version_and_header_length_rejected(self):
+        for data in (candidate_frame(version=2), candidate_frame(length=79)):
+            with self.assertRaisesRegex(wire.ProposalFormatError, "version"):
+                wire.validate_frame_header(data)
+
+    def test_flags_parameters_and_reserved_rejected(self):
+        for data in (candidate_frame(flags=1), candidate_frame(params=2)):
+            with self.assertRaisesRegex(wire.ProposalFormatError, "flags"):
+                wire.validate_frame_header(data)
+        data = bytearray(candidate_frame())
+        data[76] = 1
+        with self.assertRaisesRegex(wire.ProposalFormatError, "reserved"):
+            wire.validate_frame_header(bytes(data))
+
+    def test_corrupt_crc_rejected(self):
+        data = bytearray(candidate_frame())
+        data[72] ^= 1
+        with self.assertRaisesRegex(wire.ProposalFormatError, "CRC32C"):
+            wire.validate_frame_header(bytes(data))
+
+    def test_over_budget_rejected(self):
+        for data in (
+            candidate_frame(payload=wire.RESEARCH_MAX_FRAME_PAYLOAD + 1,
+                            decoded=wire.RESEARCH_MAX_FRAME_PAYLOAD + 1),
+            candidate_frame(payload=20, decoded=wire.RESEARCH_MAX_FRAME_DECODED + 1,
+                            codec=1),
+        ):
+            with self.assertRaisesRegex(wire.ProposalFormatError, "resource"):
+                wire.validate_frame_header(data)
+
+    def test_caller_budget_is_enforced(self):
+        with self.assertRaisesRegex(wire.ProposalFormatError, "resource"):
+            wire.validate_frame_header(candidate_frame(), max_decoded_bytes=63)
+        with self.assertRaises(ValueError):
+            wire.validate_frame_header(candidate_frame(), max_payload_bytes=-1)
+
+    def test_data_block_and_codec_rejected(self):
+        for data in (candidate_frame(block_id=0), candidate_frame(codec=65535)):
+            with self.assertRaisesRegex(wire.ProposalFormatError, "DATA"):
+                wire.validate_frame_header(data)
+
+    def test_store_requires_equal_lengths(self):
+        with self.assertRaisesRegex(wire.ProposalFormatError, "STORE"):
+            wire.validate_frame_header(candidate_frame(payload=2, decoded=3))
+
+    def test_zstd_nonempty_payload(self):
+        with self.assertRaisesRegex(wire.ProposalFormatError, "ZSTD"):
+            wire.validate_frame_header(candidate_frame(payload=0, decoded=8, codec=1))
+
+    def test_metadata_invariants_rejected(self):
+        for kwargs in (
+            {"block_id": 1},
+            {"codec": 1},
+            {"payload": 20, "decoded": 21},
+        ):
+            with self.subTest(**kwargs):
+                with self.assertRaisesRegex(wire.ProposalFormatError, "metadata"):
+                    wire.validate_frame_header(candidate_frame(kind=b"MNFT", **kwargs))
+
+    def test_fuzz_invalid_headers_never_crash(self):
+        rng = random.Random(20261014)
+        for _ in range(512):
+            random_header = rng.randbytes(80)
+            with self.assertRaises(wire.ProposalFormatError):
+                wire.validate_frame_header(random_header)
+
 if __name__ == "__main__":
     unittest.main()
