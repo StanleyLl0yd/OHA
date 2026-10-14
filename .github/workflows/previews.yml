@@ -67,11 +67,15 @@ jobs:
           }
           $records | Set-Content -LiteralPath (Join-Path $out "SHA256SUMS.txt") -Encoding utf8
           Compress-Archive -Path (Join-Path $out "*") -DestinationPath (Join-Path $env:RUNNER_TEMP "OHA-M0-Windows-x64.zip") -Force
+          python tools/preview_inventory.py --root $out --platform windows --commit $env:GITHUB_SHA --output (Join-Path $env:RUNNER_TEMP "OHA-M0-Windows-x64-inventory.json")
+          if ($LASTEXITCODE -ne 0) { throw "Preview binary inventory verification failed" }
       - name: Upload unsigned Windows preview
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: oha-m0-winui-x64-${{ github.sha }}
-          path: ${{ runner.temp }}/OHA-M0-Windows-x64.zip
+          path: |
+            ${{ runner.temp }}/OHA-M0-Windows-x64.zip
+            ${{ runner.temp }}/OHA-M0-Windows-x64-inventory.json
           if-no-files-found: error
           retention-days: 7
 
@@ -118,10 +122,13 @@ jobs:
           codesign --verify --deep --verbose=2 "$app"
           (cd "$app/Contents" && shasum -a 256 MacOS/OHA Frameworks/liboha_ffi.dylib > SHA256SUMS.txt)
           ditto -c -k --sequesterRsrc --keepParent "$app" "$RUNNER_TEMP/OHA-M0-macOS.zip"
+          python3 tools/preview_inventory.py --root "$app" --platform macos --commit "$GITHUB_SHA" --output "$RUNNER_TEMP/OHA-M0-macOS-inventory.json"
       - name: Upload ad-hoc macOS preview
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: oha-m0-macos-${{ matrix.os }}-${{ github.sha }}
-          path: ${{ runner.temp }}/OHA-M0-macOS.zip
+          path: |
+            ${{ runner.temp }}/OHA-M0-macOS.zip
+            ${{ runner.temp }}/OHA-M0-macOS-inventory.json
           if-no-files-found: error
           retention-days: 7
