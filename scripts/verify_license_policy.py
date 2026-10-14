@@ -39,7 +39,7 @@ def verify() -> list[str]:
             errors.append(str(manifest.relative_to(ROOT)) + " must inherit MPL")
     if (ROOT / "Package.swift").read_text(encoding="utf-8").splitlines()[0] != "// swift-tools-version: 6.0":
         errors.append("SwiftPM tools-version directive must remain first")
-    if "SPDX-License-Identifier: MPL-2.0" not in (ROOT / "Package.swift").read_text(encoding="utf-8").splitlines()[:5]:
+    if not any("SPDX-License-Identifier: MPL-2.0" in line for line in (ROOT / "Package.swift").read_text(encoding="utf-8").splitlines()[:5]):
         errors.append("Package.swift needs MPL marker")
     return errors
 
