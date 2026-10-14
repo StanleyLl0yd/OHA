@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "kind": "deterministic_tar_baseline_NOT_oha_or_7z",
+  "notes": "Sequential reps. No RSS/random-file extraction/cold cache controls. End-to-end package+encode = tar_build_ms + encode_ms.",
+  "input_files": [
+    {
+      "path": "01-license-text.txt",
+      "size": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "path": "02-config-schema.json",
+      "size": 119558,
+      "sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+    },
+    {
+      "path": "03-iso-data.json",
+      "size": 874782,
+      "sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+    },
+    {
+      "path": "04-elf-grep.bin",
+      "size": 203152,
+      "sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+    },
+    {
+      "path": "05-elf-libcrypto.bin",
+      "size": 6513216,
+      "sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+    },
+    {
+      "path": "06-image-png.png",
+      "size": 51312,
+      "sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+    },
+    {
+      "path": "07-image-jpeg.jpg",
+      "size": 292349,
+      "sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+    },
+    {
+      "path": "08-pdf.pdf",
+      "size": 2278676,
+      "sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+    },
+    {
+      "path": "09-zip.zip",
+      "size": 39142,
+      "sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+    }
+  ],
+  "runs": [
+    {
+      "codec": "TAR+ZSTD-3",
+      "repetition": 1,
+      "tar_bytes": 10424320,
+      "compressed_bytes": 4516794,
+      "tar_build_ms": 4.489,
+      "encode_ms": 54.271,
+      "decode_ms": 14.732,
+      "verify_ms": 17.053,
+      "status": "sha256-verified"
+    },
+    {
+      "codec": "TAR+XZ-3",
+      "repetition": 1,
+      "tar_bytes": 10424320,
+      "compressed_bytes": 4033928,
+      "tar_build_ms": 5.062,
+      "encode_ms": 1791.814,
+      "decode_ms": 122.243,
+      "verify_ms": 19.19,
+      "status": "sha256-verified"
+    },
+    {
+      "codec": "TAR+ZSTD-3",
+      "repetition": 2,
+      "tar_bytes": 10424320,
+      "compressed_bytes": 4516794,
+      "tar_build_ms": 4.922,
+      "encode_ms": 57.097,
+      "decode_ms": 15.295,
+      "verify_ms": 17.374,
+      "status": "sha256-verified"
+    },
+    {
+      "codec": "TAR+XZ-3",
+      "repetition": 2,
+      "tar_bytes": 10424320,
+      "compressed_bytes": 4033928,
+      "tar_build_ms": 5.55,
+      "encode_ms": 1962.719,
+      "decode_ms": 111.709,
+      "verify_ms": 16.362,
+      "status": "sha256-verified"
+    },
+    {
+      "codec": "TAR+ZSTD-3",
+      "repetition": 3,
+      "tar_bytes": 10424320,
+      "compressed_bytes": 4516794,
+      "tar_build_ms": 5.295,
+      "encode_ms": 48.323,
+      "decode_ms": 14.761,
+      "verify_ms": 16.016,
+      "status": "sha256-verified"
+    },
+    {
+      "codec": "TAR+XZ-3",
+      "repetition": 3,
+      "tar_bytes": 10424320,
+      "compressed_bytes": 4033928,
+      "tar_build_ms": 5.857,
+      "encode_ms": 1913.207,
+      "decode_ms": 112.394,
+      "verify_ms": 15.471,
+      "status": "sha256-verified"
+    }
+  ]
+}

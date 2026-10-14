@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "dataset_kind": "system-installed-files_only",
+  "source_environment": "Debian GNU/Linux 13 container (2026-10-14)",
+  "notes": "Not bundled. Selected for illustrative codec comparison only; not an independent representative corpus. Inputs may have third-party copyrights. Do not distribute raw files.",
+  "entries": [
+    {
+      "file": "01-license-text.txt",
+      "source": "/usr/share/common-licenses/GPL-3",
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "file": "02-config-schema.json",
+      "source": "/usr/share/cmake-3.31/Help/manual/presets/schema.json",
+      "bytes": 119558,
+      "sha256": "218526d920244066036d7347e22c17cf8c0c56bfe3ddf6faff4ac0e2cbaff5b5"
+    },
+    {
+      "file": "03-iso-data.json",
+      "source": "/usr/share/iso-codes/json/iso_639-3.json",
+      "bytes": 874782,
+      "sha256": "9636ce5266053867627140ce5ada1f9aa897ca07a7501302c1b14b8d1147cdda"
+    },
+    {
+      "file": "04-elf-grep.bin",
+      "source": "/usr/bin/grep",
+      "bytes": 203152,
+      "sha256": "bd6686bf7a650a9717fd7e73fdb07dc63b70547a1da41bce093c56df937a66eb"
+    },
+    {
+      "file": "05-elf-libcrypto.bin",
+      "source": "/usr/lib/x86_64-linux-gnu/libcrypto.so.3",
+      "bytes": 6513216,
+      "sha256": "817bad46d13343da6b96045a0629d2d675f21f5d5aacf5546ab9d424fb601e2c"
+    },
+    {
+      "file": "06-image-png.png",
+      "source": "/usr/share/icons/hicolor/512x512/apps/libreoffice-math.png",
+      "bytes": 51312,
+      "sha256": "bfb1ba201bf16c29a21f219b3af91b75bf05f28681c01613ee52075eddfef247"
+    },
+    {
+      "file": "07-image-jpeg.jpg",
+      "source": "/usr/share/texlive/texmf-dist/tex/latex/beamer2thesis/logopolito.jpg",
+      "bytes": 292349,
+      "sha256": "00426a687dd531429a929a13412c8a452d47698f688c89b8b4d15c988eefb0be"
+    },
+    {
+      "file": "08-pdf.pdf",
+      "source": "/usr/share/texlive/texmf-dist/scripts/ketcindy/ketlib/oshima/os_muldif.pdf",
+      "bytes": 2278676,
+      "sha256": "ecc0df102fc99ecabd0e587c77e0dd8a13de9322a69f36927aa20eab6917dd87"
+    },
+    {
+      "file": "09-zip.zip",
+      "source": "/mnt/data/OHA-M0-starter.zip",
+      "bytes": 39142,
+      "sha256": "bd4262d5529e779d0fe777a1da03a5912493bf2413b8b0cd62ccac715ec4e4fd"
+    }
+  ]
+}
