@@ -1,0 +1,119 @@
+name: M0 Native Preview Artifacts
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/previews.yml"
+      - "apps/oha-windows/**"
+      - "apps/oha-macos/**"
+      - "crates/oha-ffi/**"
+      - "include/**"
+      - "Package.swift"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/previews.yml"
+      - "apps/oha-windows/**"
+      - "apps/oha-macos/**"
+      - "crates/oha-ffi/**"
+      - "include/**"
+      - "Package.swift"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: native-preview-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows-preview:
+    name: Windows unpackaged preview (unsigned)
+    runs-on: windows-2022
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Enforce workflow supply chain policy
+        shell: pwsh
+        run: python scripts/verify_ci_supply_chain.py
+      - name: Install pinned Rust toolchain
+        shell: pwsh
+        run: rustup toolchain install 1.89.0 --profile minimal
+      - name: Build native Rust library
+        shell: pwsh
+        run: cargo build -p oha-ffi --release --locked
+      - name: Publish unpackaged self-contained WinUI 3 preview
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $out = Join-Path $env:RUNNER_TEMP "OHA-Windows-x64"
+          dotnet publish apps/oha-windows/OHA.Windows.csproj -c Release -p:Platform=x64 -p:RuntimeIdentifier=win-x64 -p:WindowsAppSDKSelfContained=true -p:SelfContained=true -p:PublishSingleFile=false -o $out
+          if ($LASTEXITCODE -ne 0) { throw "WinUI publish failed" }
+          Copy-Item -LiteralPath "target/release/oha_ffi.dll" -Destination (Join-Path $out "oha_ffi.dll")
+          if (-not (Test-Path (Join-Path $out "OHA.Windows.exe"))) { throw "Missing Windows EXE" }
+          if (-not (Test-Path (Join-Path $out "oha_ffi.dll"))) { throw "Missing Rust FFI DLL" }
+          $records = Get-ChildItem -LiteralPath $out -File -Recurse | Sort-Object FullName | ForEach-Object {
+            $relative = [System.IO.Path]::GetRelativePath($out, $_.FullName).Replace("\", "/")
+            "$( (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() ) *$relative"
+          }
+          $records | Set-Content -LiteralPath (Join-Path $out "SHA256SUMS.txt") -Encoding utf8
+          Compress-Archive -Path (Join-Path $out "*") -DestinationPath (Join-Path $env:RUNNER_TEMP "OHA-M0-Windows-x64.zip") -Force
+      - name: Upload unsigned Windows preview
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: oha-m0-winui-x64-${{ github.sha }}
+          path: ${{ runner.temp }}/OHA-M0-Windows-x64.zip
+          if-no-files-found: error
+          retention-days: 7
+
+  macos-preview:
+    name: macOS ad-hoc preview ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-15-intel]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Enforce workflow supply chain policy
+        run: python3 scripts/verify_ci_supply_chain.py
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.89.0 --profile minimal
+      - name: Build native Rust library
+        run: cargo build -p oha-ffi --locked
+      - name: Build and package local SwiftUI app preview
+        run: |
+          set -euo pipefail
+          builddir="$RUNNER_TEMP/oha-swift-preview"
+          swift build -c release --build-path "$builddir"
+          binpath="$(swift build -c release --build-path "$builddir" --show-bin-path)"
+          app="$RUNNER_TEMP/OHA.app"
+          mkdir -p "$app/Contents/MacOS" "$app/Contents/Frameworks"
+          cp "$binpath/OHAPrototype" "$app/Contents/MacOS/OHA"
+          cp apps/oha-macos/Info.plist "$app/Contents/Info.plist"
+          cp target/debug/liboha_ffi.dylib "$app/Contents/Frameworks/liboha_ffi.dylib"
+          old_name="$(otool -L "$app/Contents/MacOS/OHA" | awk '/liboha_ffi[.]dylib/{print $1; exit}')"
+          test -n "$old_name"
+          install_name_tool -change "$old_name" "@executable_path/../Frameworks/liboha_ffi.dylib" "$app/Contents/MacOS/OHA"
+          otool -L "$app/Contents/MacOS/OHA" | grep -F "@executable_path/../Frameworks/liboha_ffi.dylib"
+          codesign --force --deep --sign - "$app"
+          codesign --verify --deep --verbose=2 "$app"
+          (cd "$app/Contents" && shasum -a 256 MacOS/OHA Frameworks/liboha_ffi.dylib > SHA256SUMS.txt)
+          ditto -c -k --sequesterRsrc --keepParent "$app" "$RUNNER_TEMP/OHA-M0-macOS.zip"
+      - name: Upload ad-hoc macOS preview
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: oha-m0-macos-${{ matrix.os }}-${{ github.sha }}
+          path: ${{ runner.temp }}/OHA-M0-macOS.zip
+          if-no-files-found: error
+          retention-days: 7
