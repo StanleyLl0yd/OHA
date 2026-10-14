@@ -31,6 +31,19 @@ fn is_text_byte(byte: u8) -> bool {
     byte.is_ascii_graphic() || byte == b' ' || matches!(byte, b'\n' | b'\r' | b'\t')
 }
 
+fn malformed_utf8_sequences(mut remaining: &[u8]) -> usize {
+    let mut count = 0;
+    while let Err(error) = std::str::from_utf8(remaining) {
+        count += 1;
+        let advance = error.valid_up_to()
+            + error
+                .error_len()
+                .unwrap_or(remaining.len() - error.valid_up_to());
+        remaining = &remaining[advance..];
+    }
+    count
+}
+
 /// Compute descriptive metrics; never skip a compression trial solely on these metrics.
 pub fn analyze_bytes(bytes: &[u8]) -> SampleStats {
     if bytes.is_empty() {
@@ -65,16 +78,15 @@ pub fn analyze_bytes(bytes: &[u8]) -> SampleStats {
     let ratio = ascii as f64 / length;
     let decoded = String::from_utf8_lossy(bytes);
     let mut decoded_count = 0_usize;
-    let mut replacements = 0_usize;
+    let malformed_sequences = malformed_utf8_sequences(bytes);
     let mut invalid_controls = 0_usize;
     for character in decoded.chars() {
         decoded_count += 1;
-        replacements += usize::from(character == '\u{fffd}');
         invalid_controls +=
             usize::from(character.is_control() && !matches!(character, '\n' | '\r' | '\t'));
     }
     let likely_text = zeros == 0
-        && (replacements as f64 / decoded_count as f64) < 0.01
+        && (malformed_sequences as f64 / decoded_count as f64) < 0.01
         && (invalid_controls as f64 / decoded_count as f64) < 0.05;
     SampleStats {
         input_bytes: bytes.len() as u64,
@@ -148,6 +160,27 @@ mod tests {
     fn utf8_text_is_not_classified_as_binary() {
         let text = "Привет, это текст для проверки!\n".repeat(100);
         assert_eq!(analyze_bytes(text.as_bytes()).hint, ContentHint::MostlyText);
+    }
+
+
+    #[test]
+    fn valid_unicode_replacement_character_is_text() {
+        // U+FFFD is a legitimate character, not proof of malformed UTF-8.
+        let input = "\u{fffd}".repeat(500);
+        assert_eq!(malformed_utf8_sequences(input.as_bytes()), 0);
+        assert_eq!(analyze_bytes(input.as_bytes()).hint, ContentHint::MostlyText);
+    }
+
+    #[test]
+    fn malformed_utf8_sequences_are_counted_separately() {
+        let mixed = format!("{}{}", "\u{fffd}".repeat(100), "\u{fffd}");
+        assert_eq!(malformed_utf8_sequences(mixed.as_bytes()), 0);
+        let mut bytes = mixed.into_bytes();
+        bytes.push(0xff);
+        assert_eq!(malformed_utf8_sequences(&bytes), 1);
+        assert_eq!(analyze_bytes(&bytes).hint, ContentHint::MostlyText);
+        assert_eq!(malformed_utf8_sequences(&[0xff; 100]), 100);
+        assert_eq!(analyze_bytes(&[0xff; 100]).hint, ContentHint::Binary);
     }
 
     #[test]
