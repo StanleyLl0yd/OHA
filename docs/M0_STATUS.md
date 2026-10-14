@@ -22,3 +22,9 @@ Updated 2026-10-14 following GitHub repository creation and import PR #1. M0 rem
 6. Final mandatory complete two-pass repository-wide audit and full exit verification (#7).
 
 Do not close M0 or start M1 before all exit criteria are supported by evidence.
+
+## Security and CI subsequent updates
+
+- PR #8 merged: strict `verify` on Linux/Windows/macOS and Python, Semgrep, Gitleaks, Dependency Review and CodeQL; main ruleset and immutable release tags active.
+- PR #9 merged: SHA-pinned CodeQL Action update.
+- Experimental Rust C ABI and cross-language smoke tests tracked under #6; they are **not** the complete native GUI/FFI acceptance criterion.

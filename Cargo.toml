@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/oha-analysis", "crates/oha-policy", "apps/oha-cli"]
+members = ["crates/oha-analysis", "crates/oha-policy", "apps/oha-cli", "crates/oha-ffi"]
 resolver = "3"
 
 [workspace.package]

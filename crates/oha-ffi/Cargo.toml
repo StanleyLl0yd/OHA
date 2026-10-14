@@ -1,0 +1,14 @@
+[package]
+name = "oha-ffi"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+oha-analysis = { path = "../oha-analysis" }
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"

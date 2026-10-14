@@ -48,3 +48,9 @@ Do not use this example header to build a shipping application. For actual imple
 3. Progress/cancel and error marshalling on Windows and macOS.
 4. A native large-file virtualized file-list with 100k synthetic entries in each UI.
 5. Negative tests: invalid pointers, double-close, concurrent cancel/poll, oversized event, UI event loop not blocked.
+
+## M0 implemented experimental ABI probe (not the proposed job API)
+
+`crates/oha-ffi` exposes `oha_api_version()` and synchronous `oha_analyze_bytes_v1(input, length, output)` as a `cdylib`. Its fixed C layout is defined in `include/oha_ffi.h`. The caller owns input/output memory, passes `struct_size=72` and `version=1`, and receives a numeric status and descriptive metrics. Input is capped at 192 KiB. Empty/null input is accepted only at length zero. Non-null invalid pointers are caller-contract violations and cannot be safely detected or recovered from. Non-overlap and alignment are mandatory; Rust does not retain or free pointers. The entrypoint catches Rust panics and returns a status, but **this is not process isolation**.
+
+Rust unit tests and Python `ctypes` foreign-language tests verify the ABI on Linux x64, Windows x64, macOS ARM64 and macOS Intel. The native WinUI 3 and SwiftUI/AppKit graphical clients, long-running jobs and cancellation protocol remain M0 work. This synchronous probe is **not** an archive parser, stable public ABI, or production API.
