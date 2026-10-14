@@ -36,10 +36,52 @@ jobs:
           7z i | head -n 5
       - name: Run real decoder regression tests
         run: python3 -m unittest discover -s tests -p 'test_baseline_7z.py' -v
+      - name: Fetch pinned Canterbury benchmark mirror (not redistributed)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: zlib-ng/corpora
+          ref: fd01e05b0e8d1736e7178427297f3790402d4bf4
+          path: research-corpora
+          sparse-checkout: canterbury
+          filter: blob:none
+          persist-credentials: false
+      - name: Verify pinned Canterbury mirror sample inventory
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root = Path("research-corpora/canterbury")
+          expected = {
+              "alice29.txt": 148481,
+              "asyoulik.txt": 125179,
+              "cp.html": 24603,
+              "fields.c": 11150,
+              "grammar.lsp": 3721,
+              "kennedy.xls": 1029744,
+              "lcet10.txt": 419235,
+              "plrabn12.txt": 471162,
+              "ptt5": 513216,
+              "sum": 38240,
+              "xargs.1": 4227,
+          }
+          actual = {}
+          if not root.is_dir() or root.is_symlink():
+              raise SystemExit("Pinned Canterbury directory missing/unsafe")
+          for file in root.iterdir():
+              if file.is_symlink() or not file.is_file():
+                  raise SystemExit(f"Unexpected corpus entry: {file.name}")
+              actual[file.name] = file.stat().st_size
+          if actual != expected:
+              raise SystemExit(f"Corpus manifest mismatch: {actual!r}")
+          print(f"Pinned Canterbury mirror verified: {len(actual)} files, {sum(actual.values())} bytes")
+          PY
       - name: Measure repository text corpus with independent 7-Zip
         run: |
           python3 tools/baseline_7z.py docs --output "$RUNNER_TEMP/oha-7z-results.json" --repetitions 2
           python3 tools/baseline_tar.py docs --output "$RUNNER_TEMP/oha-tar-results.json" --repetitions 2
+      - name: Measure pinned Canterbury corpus (archive and selective extraction)
+        run: |
+          python3 tools/baseline_7z.py research-corpora/canterbury --output "$RUNNER_TEMP/oha-canterbury-7z-results.json" --repetitions 3
+          python3 tools/baseline_tar.py research-corpora/canterbury --output "$RUNNER_TEMP/oha-canterbury-tar-results.json" --repetitions 3
       - name: Publish raw reproducibility results
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -47,5 +89,7 @@ jobs:
           path: |
             ${{ runner.temp }}/oha-7z-results.json
             ${{ runner.temp }}/oha-tar-results.json
+            ${{ runner.temp }}/oha-canterbury-7z-results.json
+            ${{ runner.temp }}/oha-canterbury-tar-results.json
           if-no-files-found: error
           retention-days: 30
