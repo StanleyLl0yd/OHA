@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import COHAFFI
 
 struct OHAHomeView: View {
     @State private var result = "Ready"

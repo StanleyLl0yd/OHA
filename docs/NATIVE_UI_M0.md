@@ -11,3 +11,5 @@ Windows: build the Rust `oha-ffi` crate in the same checkout (`cargo build -p oh
 macOS: build the Rust library (`cargo build -p oha-ffi --locked`), then use `swiftc -parse-as-library -import-objc-header include/oha_ffi.h -L target/debug -loha_ffi apps/oha-macos/OHAApp.swift -o OHA`. The `.dylib` must be discoverable at runtime, e.g. through an appropriate bundle placement and `@rpath` configuration. This sample is **not a distributable `.app` bundle** and is not notarized. Use Xcode tooling appropriate to the target OS.
 
 A successful desktop CI build proves compilation/linkage only. No public FFI ABI or `.oha` format is frozen.
+
+For the SwiftUI shell, the repository root `Package.swift` defines a local Swift Package Manager executable and `include/module.modulemap` exports the canonical C ABI header as the `COHAFFI` module. Use `swift build -c release` after building Rust. This is an executable compilation probe rather than a packaged `.app`. The SwiftPM build is also traced by the CodeQL Swift job; direct `swiftc` foreign-caller smoke remains separate.

@@ -58,7 +58,7 @@ jobs:
       - name: Build Rust native library
         run: cargo build -p oha-ffi --locked
       - name: Compile SwiftUI/AppKit native application
-        run: swiftc -parse-as-library -import-objc-header include/oha_ffi.h -L target/debug -loha_ffi apps/oha-macos/OHAApp.swift -o "$RUNNER_TEMP/OHA"
+        run: swift build -c release --build-path "$RUNNER_TEMP/oha-native-swift-build"
       - name: Compile and execute Swift foreign-caller smoke
         run: |
           swiftc -import-objc-header include/oha_ffi.h -L target/debug -loha_ffi apps/oha-macos/FFISmoke.swift -o "$RUNNER_TEMP/OHAFFISmoke"
