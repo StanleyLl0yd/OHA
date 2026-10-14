@@ -28,3 +28,7 @@ Do not close M0 or start M1 before all exit criteria are supported by evidence.
 - PR #8 merged: strict `verify` on Linux/Windows/macOS and Python, Semgrep, Gitleaks, Dependency Review and CodeQL; main ruleset and immutable release tags active.
 - PR #9 merged: SHA-pinned CodeQL Action update.
 - Experimental Rust C ABI and cross-language smoke tests tracked under #6; they are **not** the complete native GUI/FFI acceptance criterion.
+
+## Next M0 benchmark work
+
+- Independent 7-Zip LZMA2 archive and selective-extraction harness prepared for CI validation. No representative performance claim or complete holdout corpus yet; #3 remains open.

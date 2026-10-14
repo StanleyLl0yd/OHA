@@ -12,7 +12,7 @@ Deliverables:
 - [x] Verify Rust 1.89 toolchain and execute Linux x86_64, Windows x64, and macOS arm64 builds, fmt, Clippy and Rust tests (GitHub Actions PR #1).
 - [x] Verify macOS x86_64 runner Rust fmt, Clippy, tests and build (PR #1).
 - [ ] Validate native GUI/FFI targets; a bounded Rust C ABI/foreign-caller smoke prototype is in progress.
-- [ ] Complete real diverse benchmark corpora and independent 7-Zip, ZSTD, XZ/LZMA2 archive baselines with extraction and memory measurements. Initial 9-file/108-roundtrip real codec probe and six verified TAR+ZSTD/XZ multi-file archive runs recorded; 7-Zip, RSS, holdout and random extraction pending.
+- [ ] Complete real diverse benchmark corpora and independent 7-Zip, ZSTD, XZ/LZMA2 archive baselines with extraction and memory measurements. Initial 9-file/108-roundtrip codec probe and six TAR+ZSTD/XZ runs recorded; independent 7-Zip full/selective extraction and RSS harness under test. Representative holdout and controlled measurements pending.
 - [ ] Resolve project distribution license and codec redistribution/licensing policy.
 - [ ] Review/approve v1 `.oha` wire format design and codec registry (actual implementation belongs to M1). Preliminary framing proposal and read-only negative tests prepared.
 - [ ] Minimal native GUI prototypes, compile on Windows/macOS and validate Rust FFI semantics.
