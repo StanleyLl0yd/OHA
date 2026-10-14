@@ -1,50 +1,33 @@
-# M0 current status
+# OHA M0 status and evidence map
 
-Updated 2026-10-14 following GitHub repository creation and import PR #1. M0 remains OPEN.
+**Date:** 2026-10-14. **Milestone:** M0 Architecture & Research, **OPEN**. Baseline main when this document was reconciled: `4daffbb60de87b66804d73fde83b37ce58881dce`.
 
-## Verified and completed
+**There is NO production `.oha` archive writer, reader, pack, extract or encryption implementation.** The CLI only analyzes local file samples. All physical wire proposals and path policy experiments are unapproved research. A build-green desktop shell is not interactive GUI acceptance.
 
-- Public GitHub repository `StanleyLl0yd/OHA` created; 44-file scaffold imported in draft PR #1.
-- Core brand OHA, `.oha`, offline Rust core, Windows WinUI 3/C#, macOS SwiftUI/AppKit and Linux CLI architecture fixed.
-- Four ADRs, architecture/security/format/policy documentation, numeric-only versioning and mandatory two-pass whole-repository milestone exit audit in `AGENTS.md`.
-- Rust 1.89.0 workspace fmt, Clippy (`-D warnings`), unit tests and build PASSED GitHub Actions on Linux x86_64, Windows x64 and macOS arm64 after formatting fix (PR #1).
-- Python 28/28 unit tests PASSED; 72 synthetic and 108 individual real-file codec roundtrips SHA-256 verified, plus six TAR+ZSTD/XZ verified runs. Baselines are illustrative, not representative head-to-head archive performance claims.
-- Candidate v1 framing proposal with read-only CRC32C parser and negative tests. No actual `.oha` archive writer or reader exists.
-- License options and codec redistributability research documented; no LICENSE approved or added.
+## Confirmed work
 
-## Outstanding M0 gates (tracked in issues #2 through #7)
+| Gate / component | Evidence | State |
+|---|---|---|
+| Repository source, MPL-2.0, branch security | PR #1, #8, #19, #20; active main/tag rulesets | PASS for source and branch policy |
+| Rust Core research and CLI | Rust 1.89.0 CI on Linux x64, Windows x64, macOS ARM64 and Intel | PASS |
+| FFI boundary | PR #10, #12, #14: Rust/ctypes, C# PInvoke and Swift native ABI smoke | PASS for bounded synchronous in-memory probe |
+| Native WinUI 3 and SwiftUI/AppKit shells | PR #12/#14; protected `verify` includes native builds and foreign callers | PASS compilation/interop, not user GUI acceptance |
+| Native preview bundles | PR #15/#19; Windows self-contained preview and macOS ARM64/Intel ad-hoc bundles | 3/3 packaged; unsigned/non-notarized |
+| Python/SAST/supply chain | Rust CI, Python regression, Semgrep, Gitleaks, Dependency Review (PR), 5-language CodeQL; SHA-pinned Actions | PASS on baseline main |
+| Independent compression reference | PR #11/#18: 7-Zip LZMA2 solid/non-solid, TAR+XZ/ZSTD, SHA-256 roundtrip and selected-file extract on source-controlled/provenance-pinned corpora | PASS exploratory measurements only |
+| Binary inventory | PR #20: manifest SHA-256 + source provenance from real Windows/macOS artifact, candidate native dependency list | PASS inventory; **not** release legal clearance |
+| Format research | PR #13: header/footer and frame CRC/limits; PR #21 and #22 are further proposals under review | Research only; no full archive conformance |
 
-1. Confirm all required Rust CI variants including macOS x86_64; generate/validate committed Cargo.lock and final-main CI evidence (#2).
-2. Independent realistic 7-Zip and other archive baselines including extraction, peak RSS and random-access measures (#3).
-3. Owner-approved repository license and third-party codec redistribution policy (#4).
-4. Review and approve byte-precise `.oha` format and codec registry, with independent vectors (#5).
-5. Build/validate native WinUI and SwiftUI/AppKit GUI/FFI smoke prototypes (#6).
-6. Final mandatory complete two-pass repository-wide audit and full exit verification (#7).
+## OPEN M0 exit blockers
 
-Do not close M0 or start M1 before all exit criteria are supported by evidence.
+1. **#3: Benchmark representativeness.** Extend to precompressed media, database/VM data and holdout sets; record cold/warm cache, noise/dispersion, memory, time and extraction metrics. No claim OHA outperforms anything before a real writer exists.
+2. **#4: Third-party redistribution.** Original code is already MPL-2.0; exact Windows App SDK/.NET/WinRT self-contained licenses and notice/end-user term requirements need a versioned binary-by-binary decision. BZip3 and 7-Zip code remain on hold.
+3. **#5: Format approval.** Decide canonical manifest/index encoding, portable filename semantics, codec/feature registry, quotas, metadata rejection/portability and future version behavior. Candidate read-only research is not a standard. Approval must precede M1 implementation.
+4. **#6 and #16: Native GUI on devices.** WinUI/SwiftUI compilation and FFI calls are confirmed, but there is no physical-device, interactive GUI acceptance. Unsigned M0 artifact provenance must be verified before launching; signing/notarization and production packaging are later gates.
+5. **#7: Mandatory milestone-wide two-pass audit.** Run twice over the *entire* repository, dependencies, source, CI, docs, tests, platform integration, security and candidate format after all preceding gates. Record fixes, intentional no-ops and exact-main final CI. Do not close M0 early.
 
-## Security and CI subsequent updates
+## M0 vs M1 boundary
 
-- PR #8 merged: strict `verify` on Linux/Windows/macOS and Python, Semgrep, Gitleaks, Dependency Review and CodeQL; main ruleset and immutable release tags active.
-- PR #9 merged: SHA-pinned CodeQL Action update.
-- Experimental Rust C ABI and cross-language smoke tests tracked under #6; they are **not** the complete native GUI/FFI acceptance criterion.
+M0 is architecture/research/accepted contracts/verified prototypes. It **does not** implement a usable OHA archive. M1 builds the first accepted STORE+ZSTD archive writer/reader, CLI pack/list/test/extract and independent conformance/fuzz/security testing. The draft format's conformance requirement before publication of a **stable** format is a later release gate, not evidence that M0 already implemented a decoder.
 
-## Next M0 benchmark work
-
-- Independent 7-Zip LZMA2 archive and selective-extraction harness prepared for CI validation. No representative performance claim or complete holdout corpus yet; #3 remains open.
-
-## Native UI M0 work
-
-- C ABI successfully verified via Rust and Python foreign caller on four OS runners (PR #10).
-- Minimal native Windows WinUI 3/C# and macOS SwiftUI/AppKit visual shells prepared for hosted compilation; see `docs/NATIVE_UI_M0.md`. No native user interaction or installation/signing validated yet (#6 remains open).
-
-## Native checks become mandatory
-
-The separate native shell CI is being consolidated into the protected `verify` gate. In addition to Rust/Python/security checks, `verify` must require Windows WinUI build and real C#->Rust PInvoke smoke, plus macOS ARM64 and Intel SwiftUI/AppKit build and Swift->Rust smoke. This is compile-and-interop evidence, not visual UI/UX acceptance (#6 remains open).
-
-- PR #13 (`4a90cd6e`) merged: research-only checks of DATA/MNFT/INDX frame header, fixed-length/CRC32C and resource bounds. `.oha` wire format remains UNAPPROVED; issue #5 open.
-
-## MPL-2.0 adopted (2026-10-14)
-
-- OHA source-license selection is final: MPL-2.0. The official LICENSE, SPDX source markers, Cargo workspace declaration, contributor/author attribution, bundled preview license/source link and CI marker check are introduced in PR #19.
-- This does not resolve third-party Windows App SDK/.NET redistributable licensing. Issue #4 remains open for actual binary inventory, notices and compliant product release distribution. No commercialization fee is imposed by MPL.
+The first 44-file import, early test counts and preliminary prototypes were superseded by subsequent merged PRs. Use GitHub's protected `verify`, CodeQL, benchmark and native preview runs for current proof rather than historical static numbers.

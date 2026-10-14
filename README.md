@@ -47,7 +47,7 @@ tests/test_benchmark.py        Research harness regression tests
 
 ## Running the research scaffold
 
-Requires Rust 1.89.0 or newer compatible with edition 2024. Rust workspace formatting, Clippy, tests and build passed on GitHub Actions with Rust 1.89.0 for Linux x86_64, Windows x64 and macOS arm64 (PR #1); additional targets may require separate validation.
+Requires Rust 1.89.0 or newer compatible with edition 2024. Rust workspace formatting, Clippy, unit tests and build PASS on GitHub Actions with Rust 1.89.0 for Linux x64, Windows x64, macOS ARM64 and macOS Intel. Native C#/Swift FFI smoke is also required by protected CI.
 
 ```sh
 cargo fmt --all -- --check
@@ -66,14 +66,14 @@ python3 tools/benchmark.py ./sample-corpus --output ./bench-results.json --repet
 
 **Do not use synthetic corpus results to claim superiority over other archivers.** An independent real 7-Zip LZMA2 research baseline is present; representative holdout corpora, controlled RSS and cold/warm repetitions, and an actual OHA writer are still required before performance claims.
 
-## Important decisions that remain open
+## Remaining design and release gates
 
 - OHA's original source code is licensed under **MPL-2.0**, with file-level copyleft and attribution/notice requirements when distributing covered modifications; third-party library licenses remain separate.
 - `.oha` binary wire specification: **draft constraints only**. No backwards-compatibility promises yet.
 - Codec dependencies: STORE + ZSTD first; LZMA2, BZip3 and LZ4 only after legal and cross-platform assessment.
 - BLAKE3 and FastCDC for M3, after M1/M2 reliability requirements are satisfied.
 - Security/crypto design: no home-grown cryptography; authenticated encryption added after threat model review.
-- Windows/macOS GUI: native shells compile in CI and call the Rust experimental ABI; interactive operation, packaging and long-running jobs are not verified.
+- Windows/macOS GUI: native shells compile in CI and call the Rust experimental ABI; unsigned/ad-hoc research preview bundles are built and inventoried, but interactive device UX, production packaging/signing and long-running jobs are not verified.
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for acceptance criteria and unresolved work.
 
@@ -82,7 +82,7 @@ See [`docs/ROADMAP.md`](docs/ROADMAP.md) for acceptance criteria and unresolved 
 - Exploratory local real-file measurements: `docs/research/REAL_PROBE_RESULTS.md` (no OHA vs 7-Zip claim).
 - **Unapproved** candidate binary framing: `docs/FORMAT_V1_PROPOSAL.md` and read-only `tools/wire_header_probe.py`. This is not a working `.oha` implementation.
 - OHA project source license is MPL-2.0, governed by root `LICENSE`. Details: `CONTRIBUTING.md`, `AUTHORS.md`, `THIRD_PARTY_NOTICES.md` and `docs/LICENSING_RESEARCH.md`.
-- Toolchain pin: `rust-toolchain.toml` (1.89.0); Cargo cannot be built in the current authoring environment and requires CI verification.
+- Toolchain pin: `rust-toolchain.toml` (1.89.0); the complete Rust workspace builds and tests on four hosted CI configurations.
 
 ## Native and security verification
 
