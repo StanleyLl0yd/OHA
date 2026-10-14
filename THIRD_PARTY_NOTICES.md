@@ -13,3 +13,7 @@ OHA project-owned source is licensed under [MPL-2.0](LICENSE). **This is a preli
 | Canterbury corpus mirror | CI benchmark material | Downloaded transiently; not included in OHA archive artifacts |
 
 Prior to any production/release redistribution, enumerate **actual** included DLLs/dylibs/runtime binaries and required complete third-party notices/license texts; review Microsoft and any other vendor-specific EULAs. Do not label third-party runtime binaries MPL-2.0. Candidate libzstd/liblzma/liblz4/BZip3/7-Zip licensing details in [docs/LICENSING_RESEARCH.md](docs/LICENSING_RESEARCH.md). Issue #4 stays OPEN until this separate release gate is met.
+
+### Machine-readable preview inventories
+
+Every new preview now emits a separate JSON inventory with full per-file SHA-256 hashes and any .NET `.deps.json` component names/types. Listed native binaries are **candidates requiring human license mapping**, not approved dependencies and not an SPDX SBOM. Exact copyright holders, redistributable files and required Microsoft license texts must be verified before release; #4 remains open.
