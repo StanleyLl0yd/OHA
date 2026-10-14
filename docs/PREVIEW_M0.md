@@ -19,3 +19,7 @@ The workflow verifies that the published Windows EXE and Rust DLL are present, a
 ## MPL-2.0 source availability
 
 OHA project-authored source is licensed under MPL-2.0. Native preview packages now include the original official LICENSE text, a THIRD_PARTY_NOTICES inventory, and SOURCE-CODE.txt identifying the exact GitHub commit used to build the preview. The corresponding source can be obtained at https://github.com/StanleyLl0yd/OHA/tree/<commit-id>. This is required for MPL-covered binaries and is not a substitute for the outstanding Windows App SDK runtime licensing/redistribution verification. Packages remain non-production research probes.
+
+## Machine-readable binary inventories (M0)
+
+Each CI preview artifact includes an external `OHA-M0-*-inventory.json` alongside its ZIP. The source-controlled `tools/preview_inventory.py` verifies MPL text, exact commit source notice, integrity checksums, required native binaries, rejects symlinks/unsupported filesystem entries and records SHA-256/size/path for every artifact file. For Windows, it also parses any bundled `.deps.json` library metadata. The inventory labels native binaries that **may** be third-party components; it deliberately does **not** assign their legal licenses or certify redistribution. The manifest is outside the macOS `.app` so Code Signing remains valid. Actual package-specific terms and end-user compliance still block product release (#4).
