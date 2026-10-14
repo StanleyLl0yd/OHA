@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MPL-2.0
 """Generate deterministic *synthetic* test fixtures, not representative benchmarks."""
 
 from __future__ import annotations

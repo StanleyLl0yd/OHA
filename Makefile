@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 .PHONY: test rust-test py-test lint bench-smoke
 
 test: py-test rust-test

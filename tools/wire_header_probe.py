@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """Read-only M0 header/footer validation for an UNAPPROVED .oha wire proposal.
 
 This is not an archive reader or encoder. A successful probe result does not
