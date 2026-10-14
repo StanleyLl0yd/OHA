@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MPL-2.0
 using System.Runtime.InteropServices;
 
 namespace OHA.Windows;

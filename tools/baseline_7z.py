@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MPL-2.0
 """Independent 7-Zip LZMA2 end-to-end baseline, not OHA compression results."""
 
 from __future__ import annotations

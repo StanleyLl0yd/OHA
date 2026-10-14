@@ -13,7 +13,8 @@ Deliverables:
 - [x] Verify macOS x86_64 runner Rust fmt, Clippy, tests and build (PR #1).
 - [ ] Validate native GUI/FFI targets; bounded Rust C ABI/foreign-caller smoke PASS on four OS runners; native GUI shells under CI review.
 - [ ] Complete real diverse benchmark corpora and independent 7-Zip, ZSTD, XZ/LZMA2 archive baselines with extraction and memory measurements. Initial 9-file/108-roundtrip codec probe and six TAR+ZSTD/XZ runs recorded; independent 7-Zip full/selective extraction and RSS harness under test. Representative holdout and controlled measurements pending.
-- [ ] Resolve project distribution license and codec redistribution/licensing policy.
+- [x] Project-owned source license approved: MPL-2.0 (2026-10-14).
+- [ ] Independently verify actual third-party codec/runtime binary license and redistribution notices for each release (issue #4).
 - [ ] Review/approve v1 `.oha` wire format design and codec registry (actual implementation belongs to M1). Preliminary framing proposal and read-only negative tests prepared.
 - [ ] Minimal native GUI prototypes, compile on Windows/macOS and validate Rust FFI semantics.
 - [ ] Full M0 repository-wide two-pass audit, security review, and final CI evidence.

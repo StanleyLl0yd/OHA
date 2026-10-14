@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """Reject high-risk GitHub Actions workflow configurations without third-party YAML dependencies."""
 
 from __future__ import annotations

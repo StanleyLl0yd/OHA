@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MPL-2.0
 //! Deterministic candidate ranking for OHA's M0 policy research.
 //! These inputs are measured outcomes, not codec performance predictions.
 

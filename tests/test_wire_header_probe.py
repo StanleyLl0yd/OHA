@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """Validation tests for an UNAPPROVED on-disk layout proposal."""
 
 import importlib.util

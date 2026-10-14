@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """Tar baseline round-trip verification tests; never use unsafe extractall."""
 
 import importlib.util

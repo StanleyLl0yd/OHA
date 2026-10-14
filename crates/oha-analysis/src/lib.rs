@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MPL-2.0
 //! Bounded, content-oriented sampling metrics for OHA research.
 //!
 //! High byte entropy alone is not evidence of incompressibility.

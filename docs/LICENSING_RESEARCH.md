@@ -1,4 +1,4 @@
-# Third-party codec license research (M0, 2026-10-14)
+# OHA: source licensing and independent third-party obligations (M0)
 
 This is an inventory of candidate upstream projects, **not** a legal clearance or a final OHA license decision. No candidate native compression library is currently linked into the workspace, and benchmark command-line programs are not redistributed. Confirm the exact version, wrapper/source files, static/dynamic model, notices and distribution requirements before adding dependencies.
 

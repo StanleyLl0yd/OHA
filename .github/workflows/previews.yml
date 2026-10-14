@@ -55,6 +55,9 @@ jobs:
           dotnet publish apps/oha-windows/OHA.Windows.csproj -c Release -p:Platform=x64 -p:RuntimeIdentifier=win-x64 -p:WindowsAppSDKSelfContained=true -p:SelfContained=true -p:PublishSingleFile=false -o $out
           if ($LASTEXITCODE -ne 0) { throw "WinUI publish failed" }
           Copy-Item -LiteralPath "target/release/oha_ffi.dll" -Destination (Join-Path $out "oha_ffi.dll")
+          Copy-Item -LiteralPath "LICENSE" -Destination (Join-Path $out "LICENSE")
+          Copy-Item -LiteralPath "THIRD_PARTY_NOTICES.md" -Destination (Join-Path $out "THIRD_PARTY_NOTICES.md")
+          "MPL-2.0 covered OHA source at: https://github.com/StanleyLl0yd/OHA/tree/$env:GITHUB_SHA" | Set-Content -LiteralPath (Join-Path $out "SOURCE-CODE.txt") -Encoding utf8
           if (-not (Test-Path (Join-Path $out "OHA.Windows.exe"))) { throw "Missing Windows EXE" }
           if (-not (Test-Path (Join-Path $out "oha_ffi.dll"))) { throw "Missing Rust FFI DLL" }
           $records = Get-ChildItem -LiteralPath $out -File -Recurse | Sort-Object FullName | ForEach-Object {
@@ -102,6 +105,10 @@ jobs:
           mkdir -p "$app/Contents/MacOS" "$app/Contents/Frameworks"
           cp "$binpath/OHAPrototype" "$app/Contents/MacOS/OHA"
           cp apps/oha-macos/Info.plist "$app/Contents/Info.plist"
+          mkdir -p "$app/Contents/Resources"
+          cp LICENSE "$app/Contents/Resources/LICENSE"
+          cp THIRD_PARTY_NOTICES.md "$app/Contents/Resources/THIRD_PARTY_NOTICES.md"
+          printf "MPL-2.0 covered OHA source at: https://github.com/StanleyLl0yd/OHA/tree/%s\\n" "$GITHUB_SHA" > "$app/Contents/Resources/SOURCE-CODE.txt"
           cp target/debug/liboha_ffi.dylib "$app/Contents/Frameworks/liboha_ffi.dylib"
           old_name="$(otool -L "$app/Contents/MacOS/OHA" | awk '/liboha_ffi[.]dylib/{print $1; exit}')"
           test -n "$old_name"

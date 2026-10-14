@@ -13,7 +13,7 @@ Root instructions for automated coding agents. The owner's explicit current inst
 - Treat every archive and every archive metadata field as untrusted. Bounds before allocation, safe path handling, no arbitrary code execution from archives.
 - Do not invent a compression algorithm, custom cryptographic primitive or stable binary specification prematurely. Prefer reviewed libraries and document all license obligations.
 - Never silently lose original bytes, file versions or platform metadata. Unsupported restoration must be explicit.
-- Do not add an OSS LICENSE file until the owner approves one. No guessed redistribution permission.
+- Owner approved MPL-2.0 for original OHA source on 2026-10-14. New project-owned source files must carry SPDX-License-Identifier: MPL-2.0 or a correct Exhibit A notice; retain existing author and license notices. The source code distributed with covered binaries must remain obtainable in accordance with MPL Sections 3.1-3.4. Third-party code, binaries and benchmark corpora are never relicensed by adding an OHA header.
 
 ## Work discipline
 

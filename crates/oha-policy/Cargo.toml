@@ -1,7 +1,9 @@
+# SPDX-License-Identifier: MPL-2.0
 [package]
 name = "oha-policy"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
 publish = false
 
 [lints]
