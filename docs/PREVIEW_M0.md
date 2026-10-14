@@ -15,3 +15,7 @@ The macOS ARM64 and Intel runners package a minimal SwiftUI executable as `OHA.a
 ## Verification / limitations
 
 The workflow verifies that the published Windows EXE and Rust DLL are present, and on macOS checks the linked library path and verifies the ad-hoc bundle signature. Each preview includes SHA-256 hashes for its key content. The required CI `verify` already tests core/native builds and actual Rust FFI smoke. This preview workflow is *not* a substitute for interactive acceptance, installer signing, notarization, security audit, or M0 exit criteria. Keep Issue #6 OPEN until owner testing and agreed packaging targets are validated.
+
+## MPL-2.0 source availability
+
+OHA project-authored source is licensed under MPL-2.0. Native preview packages now include the original official LICENSE text, a THIRD_PARTY_NOTICES inventory, and SOURCE-CODE.txt identifying the exact GitHub commit used to build the preview. The corresponding source can be obtained at https://github.com/StanleyLl0yd/OHA/tree/<commit-id>. This is required for MPL-covered binaries and is not a substitute for the outstanding Windows App SDK runtime licensing/redistribution verification. Packages remain non-production research probes.
