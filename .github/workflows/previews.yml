@@ -59,7 +59,8 @@ jobs:
           if (-not (Test-Path (Join-Path $out "oha_ffi.dll"))) { throw "Missing Rust FFI DLL" }
           $records = Get-ChildItem -LiteralPath $out -File -Recurse | Sort-Object FullName | ForEach-Object {
             $relative = [System.IO.Path]::GetRelativePath($out, $_.FullName).Replace("\", "/")
-            "$( (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() ) *$relative"
+            $hash = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash *$relative"
           }
           $records | Set-Content -LiteralPath (Join-Path $out "SHA256SUMS.txt") -Encoding utf8
           Compress-Archive -Path (Join-Path $out "*") -DestinationPath (Join-Path $env:RUNNER_TEMP "OHA-M0-Windows-x64.zip") -Force
