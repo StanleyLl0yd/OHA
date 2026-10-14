@@ -15,7 +15,7 @@ MAX_TOTAL_BYTES = 2 * 1024**3
 MAX_DEPS_BYTES = 16 * 1024**2
 GITHUB_SOURCE = "https://github.com/StanleyLl0yd/OHA/tree/"
 HEX_SHA = re.compile(r"^[0-9a-f]{40}$")
-CHECKSUM_LINE = re.compile(r"^([0-9a-fA-F]{64})[ ]+\\*?(.+)$")
+CHECKSUM_LINE = re.compile(r"^([0-9a-fA-F]{64})[ ]+\*?(.+)$")
 CANDIDATE_SUFFIXES = {".dll", ".dylib", ".so", ".exe", ".winmd"}
 OWN_BINARIES = {
     "windows": {"OHA.Windows.exe", "oha_ffi.dll"},
@@ -61,7 +61,7 @@ def inventory(root: Path, platform: str, source_commit: str) -> dict:
         if required not in files:
             raise ValueError(f"required preview file missing: {required}")
     if not (root / (prefix + "LICENSE")).read_text(encoding="utf-8").startswith(
-        "Mozilla Public License Version 2.0\\n"
+        "Mozilla Public License Version 2.0\n"
     ):
         raise ValueError("expected project MPL-2.0 license text missing")
     source = (root / (prefix + "SOURCE-CODE.txt")).read_text(encoding="utf-8")
@@ -136,7 +136,7 @@ def main() -> int:
         parser.error("inventory output must be outside inspected directory")
     result = inventory(args.root, args.platform, args.commit)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
+    args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(f"Preview manifest PASS: {result['file_count']} files, "
           f"{len(result['third_party_binary_candidates_unreviewed'])} "
           "third-party candidates require separate review")
