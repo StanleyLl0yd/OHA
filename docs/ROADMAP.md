@@ -9,7 +9,8 @@ Deliverables:
 - [x] Architecture, threat model, initial decision engine and format constraints documented.
 - [x] Dependency-free Rust analyzer + selector research scaffold prepared (not yet compiled).
 - [x] Portable benchmark harness and synthetic smoke corpus created; local Python tests executed successfully.
-- [ ] Verify Rust toolchain and execute Linux/macOS/Windows builds, fmt, clippy and Rust tests.
+- [x] Verify Rust 1.89 toolchain and execute Linux x86_64, Windows x64, and macOS arm64 builds, fmt, Clippy and Rust tests (GitHub Actions PR #1).
+- [ ] Verify macOS x86_64 runner and native GUI/FFI targets; maintain required platform matrix.
 - [ ] Complete real diverse benchmark corpora and independent 7-Zip, ZSTD, XZ/LZMA2 archive baselines with extraction and memory measurements. Initial 9-file/108-roundtrip real codec probe and six verified TAR+ZSTD/XZ multi-file archive runs recorded; 7-Zip, RSS, holdout and random extraction pending.
 - [ ] Resolve project distribution license and codec redistribution/licensing policy.
 - [ ] Review/approve v1 `.oha` wire format design and codec registry (actual implementation belongs to M1). Preliminary framing proposal and read-only negative tests prepared.

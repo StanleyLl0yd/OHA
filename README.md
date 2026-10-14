@@ -41,12 +41,12 @@ tests/test_benchmark.py        Research harness regression tests
 
 ## Running the research scaffold
 
-Requires Rust 1.89.0 or newer compatible with edition 2024. The following Rust commands have **not** been executed by the creator of this scaffold because Cargo was unavailable in the authoring environment.
+Requires Rust 1.89.0 or newer compatible with edition 2024. Rust workspace formatting, Clippy, tests and build passed on GitHub Actions with Rust 1.89.0 for Linux x86_64, Windows x64 and macOS arm64 (PR #1); additional targets may require separate validation.
 
 ```sh
 cargo fmt --all -- --check
-cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace
+cargo clippy --workspace --all-targets --locked -- -D warnings
+cargo test --workspace --locked
 cargo run --bin oha-archiver -- analyze path/to/file
 ```
 

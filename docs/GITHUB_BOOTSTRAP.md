@@ -1,24 +1,15 @@
-# Import scaffold into a new GitHub repository
+# GitHub repository bootstrap (completed 2026-10-14)
 
-The connected GitHub tooling cannot create a new repository. `StanleyLl0yd/OHA` did not exist at the time this scaffold was prepared. No remote commits/PRs were made.
+Repository: https://github.com/StanleyLl0yd/OHA (public).
 
-Suggested new repository fields:
+- Default branch: `main`.
+- Initial bootstrap commit: `3c20abde5b4ae7d6cbe5992ce1f805dd4f517746`.
+- Research scaffold imported as draft PR #1: https://github.com/StanleyLl0yd/OHA/pull/1.
+- 44 original scaffold files plus subsequent CI fixes, lockfile and documentation.
+- Six focused M0 issues: #2 through #7.
 
-- **Name:** `OHA`
-- **Description:** `Optimized Hybrid Archiver: an offline, cross-platform intelligent data archiver with native Windows/macOS interfaces and a Rust CLI.`
-- **Visibility:** owner choice. Do not infer any license from public visibility.
-- **Initialize with README/license:** No, this scaffold has README; license decision pending.
-- **Topics:** `archiver`, `compression`, `rust`, `cross-platform`, `data-compression`, `backup`, `deduplication`, `windows`, `macos`, `linux`.
+The imported `.oha` binary framing is an unapproved proposal, not an implemented archival format. No repository LICENSE has been selected. Public visibility does not grant an open-source license.
 
-Import locally after examining the scaffold. The following are example commands, **not already executed**:
+Before completing M0, ensure owner-approved license and codec policy, real benchmarking baselines, Windows/macOS native GUI/FFI builds, reviewed wire format, and mandatory two-pass complete-repository audit. See `docs/ROADMAP.md` and `AGENTS.md`.
 
-```sh
-git init -b main
-git add .
-git commit -m "docs: initialize OHA M0 research scaffold"
-gh repo create StanleyLl0yd/OHA --public --source=. --remote=origin --push
-```
-
-If the owner chooses a private repository, use `--private` instead of `--public`. Do not add a `LICENSE` until approved. Before protecting `main` verify CI on all three systems, ensure default branches and security rules, then require PR review/CI for subsequent development.
-
-After repository creation, immediately run/pin Rust toolchain and fix any Windows/macOS portability issues found by CI. Generate and commit Cargo.lock to make tooling reproducible, and open focused issues for outstanding M0 gates from `docs/ROADMAP.md`.
+Protect `main` after the CI job names stabilize. Never bypass failing checks merely to merge.
