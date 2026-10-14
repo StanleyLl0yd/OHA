@@ -62,10 +62,12 @@ pub fn choose(
             let size_a = a.total_bytes().unwrap_or(u64::MAX);
             let size_b = b.total_bytes().unwrap_or(u64::MAX);
             match profile {
-                Profile::Fast => (a.encode_ms, size_a, a.decode_ms)
-                    .cmp(&(b.encode_ms, size_b, b.decode_ms)),
-                Profile::Maximum => (size_a, a.encode_ms, a.decode_ms)
-                    .cmp(&(size_b, b.encode_ms, b.decode_ms)),
+                Profile::Fast => {
+                    (a.encode_ms, size_a, a.decode_ms).cmp(&(b.encode_ms, size_b, b.decode_ms))
+                }
+                Profile::Maximum => {
+                    (size_a, a.encode_ms, a.decode_ms).cmp(&(size_b, b.encode_ms, b.decode_ms))
+                }
                 Profile::Balanced => {
                     let denominator_bytes = input_bytes.max(1) as f64;
                     let denominator_ms = limits.max_encode_ms.max(1) as f64;
@@ -106,20 +108,42 @@ mod tests {
     #[test]
     fn fast_vs_maximum() {
         let candidates = [c(Codec::Store, 1000, 1), c(Codec::Zstd, 300, 15)];
-        assert_eq!(choose(Profile::Fast, &candidates, LIMIT, 1000).unwrap().codec, Codec::Store);
-        assert_eq!(choose(Profile::Maximum, &candidates, LIMIT, 1000).unwrap().codec, Codec::Zstd);
+        assert_eq!(
+            choose(Profile::Fast, &candidates, LIMIT, 1000)
+                .unwrap()
+                .codec,
+            Codec::Store
+        );
+        assert_eq!(
+            choose(Profile::Maximum, &candidates, LIMIT, 1000)
+                .unwrap()
+                .codec,
+            Codec::Zstd
+        );
     }
 
     #[test]
     fn memory_limit_rejects_codec() {
-        let bad = Candidate { decoder_memory_bytes: u64::MAX, ..c(Codec::Lzma2, 1, 1) };
+        let bad = Candidate {
+            decoder_memory_bytes: u64::MAX,
+            ..c(Codec::Lzma2, 1, 1)
+        };
         let candidates = [bad, c(Codec::Store, 1024, 1)];
-        assert_eq!(choose(Profile::Maximum, &candidates, LIMIT, 1024).unwrap().codec, Codec::Store);
+        assert_eq!(
+            choose(Profile::Maximum, &candidates, LIMIT, 1024)
+                .unwrap()
+                .codec,
+            Codec::Store
+        );
     }
 
     #[test]
     fn overflow_rejected() {
-        let bad = Candidate { payload_bytes: u64::MAX, metadata_bytes: 1, ..c(Codec::Bzip3, 1, 1) };
+        let bad = Candidate {
+            payload_bytes: u64::MAX,
+            metadata_bytes: 1,
+            ..c(Codec::Bzip3, 1, 1)
+        };
         assert!(choose(Profile::Maximum, &[bad], LIMIT, 100).is_none());
     }
 }

@@ -70,9 +70,8 @@ pub fn analyze_bytes(bytes: &[u8]) -> SampleStats {
     for character in decoded.chars() {
         decoded_count += 1;
         replacements += usize::from(character == '\u{fffd}');
-        invalid_controls += usize::from(
-            character.is_control() && !matches!(character, '\n' | '\r' | '\t'),
-        );
+        invalid_controls +=
+            usize::from(character.is_control() && !matches!(character, '\n' | '\r' | '\t'));
     }
     let likely_text = zeros == 0
         && (replacements as f64 / decoded_count as f64) < 0.01
@@ -98,7 +97,10 @@ pub fn analyze_file(path: &Path) -> io::Result<SampleStats> {
     let mut file = File::open(path)?;
     let metadata = file.metadata()?;
     if !metadata.is_file() {
-        return Err(io::Error::new(io::ErrorKind::InvalidInput, "regular file required"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "regular file required",
+        ));
     }
     let original_size = metadata.len();
     let mut buffer = Vec::with_capacity(original_size.min(MAX_SAMPLE) as usize);
@@ -135,7 +137,10 @@ mod tests {
 
     #[test]
     fn text_and_zero_bytes() {
-        assert_eq!(analyze_bytes(b"hello world\n").hint, ContentHint::MostlyText);
+        assert_eq!(
+            analyze_bytes(b"hello world\n").hint,
+            ContentHint::MostlyText
+        );
         assert_eq!(analyze_bytes(&[0_u8; 256]).hint, ContentHint::Binary);
     }
 
