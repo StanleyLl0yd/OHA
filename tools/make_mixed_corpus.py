@@ -29,8 +29,12 @@ def file_sha256(path: Path) -> str:
 
 
 def generate(output: Path) -> dict:
-    if output.exists() and any(output.iterdir()):
-        raise ValueError("output must be empty: avoid mixing or overwriting corpora")
+    # Avoid writing through an existing symbolic link, even if its target
+    # directory is currently empty.
+    if output.is_symlink():
+        raise ValueError("output must not be a symlink")
+    if output.exists() and (not output.is_dir() or any(output.iterdir())):
+        raise ValueError("output must be a real empty directory")
     output.mkdir(parents=True, exist_ok=True)
     corpus = output / "files"
     corpus.mkdir()
