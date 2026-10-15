@@ -72,6 +72,18 @@ class Baseline7ZipTests(unittest.TestCase):
                 base.measure(root, [], sevenzip="7z", repetitions=0)
 
     @unittest.skipUnless(shutil.which("7z"), "7-Zip executable not installed")
+    def test_selective_extract_with_only_large_file(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            big = root / "large-only.bin"
+            big.write_bytes(b"abcdef0123456789" * (128 * 1024))
+            result = base.measure(root, [big], sevenzip="7z", repetitions=1,
+                                  solid_options=(False,))
+            self.assertEqual(len(result["runs"]), 1)
+            self.assertEqual(result["runs"][0]["selective_file"], "large-only.bin")
+            self.assertEqual(result["runs"][0]["selective_input_bytes"], 2 * 1024 * 1024)
+
+    @unittest.skipUnless(shutil.which("7z"), "7-Zip executable not installed")
     def test_7z_real_archive_integration(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d) / "source"
