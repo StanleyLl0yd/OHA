@@ -76,13 +76,41 @@ pub fn choose(
             let size_b = b.total_bytes().unwrap_or(u64::MAX);
             match profile {
                 Profile::Fast => {
-                    let left = (a.encode_ms, size_a, a.decode_ms, a.codec.tie_rank(), a.decoder_memory_bytes, a.payload_bytes);
-                    let right = (b.encode_ms, size_b, b.decode_ms, b.codec.tie_rank(), b.decoder_memory_bytes, b.payload_bytes);
+                    let left = (
+                        a.encode_ms,
+                        size_a,
+                        a.decode_ms,
+                        a.codec.tie_rank(),
+                        a.decoder_memory_bytes,
+                        a.payload_bytes,
+                    );
+                    let right = (
+                        b.encode_ms,
+                        size_b,
+                        b.decode_ms,
+                        b.codec.tie_rank(),
+                        b.decoder_memory_bytes,
+                        b.payload_bytes,
+                    );
                     left.cmp(&right)
                 }
                 Profile::Maximum => {
-                    let left = (size_a, a.encode_ms, a.decode_ms, a.codec.tie_rank(), a.decoder_memory_bytes, a.payload_bytes);
-                    let right = (size_b, b.encode_ms, b.decode_ms, b.codec.tie_rank(), b.decoder_memory_bytes, b.payload_bytes);
+                    let left = (
+                        size_a,
+                        a.encode_ms,
+                        a.decode_ms,
+                        a.codec.tie_rank(),
+                        a.decoder_memory_bytes,
+                        a.payload_bytes,
+                    );
+                    let right = (
+                        size_b,
+                        b.encode_ms,
+                        b.decode_ms,
+                        b.codec.tie_rank(),
+                        b.decoder_memory_bytes,
+                        b.payload_bytes,
+                    );
                     left.cmp(&right)
                 }
                 Profile::Balanced => {
