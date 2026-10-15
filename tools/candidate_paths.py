@@ -52,7 +52,13 @@ def validate_candidate_path(path: str, *, max_bytes: int = MAX_CANDIDATE_PATH_BY
         if any(ch in FORBIDDEN_WINDOWS_CHARS or
                unicodedata.category(ch) == "Cc" for ch in part):
             raise CandidatePathError("Windows-reserved or control character")
-        if DEVICE.fullmatch(part.split(".", 1)[0].casefold()):
+        stem = part.split(".", 1)[0].casefold()
+        # CreateFile also treats CONIN$ and CONOUT$ as console handles.
+        # Unlike DOS device stems, these two require exact component names.
+        # CLOCK$ is conservatively excluded because Win32 shell dialogs may
+        # treat it as a reserved device stem.
+        if (DEVICE.fullmatch(stem) or stem == "clock$"
+                or part.casefold() in ("conin$", "conout$")):
             raise CandidatePathError("Windows reserved device name")
     return path
 
