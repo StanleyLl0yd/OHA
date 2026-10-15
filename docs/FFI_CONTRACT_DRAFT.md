@@ -55,6 +55,6 @@ Do not use this example header to build a shipping application. For actual imple
 
 Rust unit tests and Python `ctypes` foreign-language tests verify the ABI on Linux x64, Windows x64, macOS ARM64 and macOS Intel. The native WinUI 3 and SwiftUI/AppKit graphical clients, long-running jobs and cancellation protocol remain M0 work. This synchronous probe is **not** an archive parser, stable public ABI, or production API.
 
-## Native GUI shells (M0, pending CI verification)
+## Native GUI shells (M0, compilation and ABI smoke CI verified)
 
-`apps/oha-windows` and `apps/oha-macos` are minimal native WinUI 3/C# and SwiftUI/AppKit visual shells. Both invoke the bounded existing `oha-ffi` C ABI over a fixed UTF-8 sample without retaining raw pointers. They do not open user files, create archives, implement jobs/cancel/progress, or define a shipping ABI. See `docs/NATIVE_UI_M0.md`. CI attempts native Windows x64 and macOS arm64/x86_64 builds plus separate Swift-to-Rust execution; interactive GUI tests remain pending.
+`apps/oha-windows` and `apps/oha-macos` are minimal native WinUI 3/C# and SwiftUI/AppKit visual shells. Both invoke the bounded existing `oha-ffi` C ABI over a fixed UTF-8 sample without retaining raw pointers. They do not open user files, create archives, implement jobs/cancel/progress, or define a shipping ABI. See `docs/NATIVE_UI_M0.md`. Protected CI **passes** Windows WinUI x64 build with C# -> Rust PInvoke smoke, and macOS arm64/x86_64 SwiftUI builds with Swift -> Rust smoke. Three research preview packages were built with source/attribution notices. Interactive GUI testing on physical devices, installer signing/notarization, long-running jobs and cancellation remain unverified.

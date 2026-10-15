@@ -1,46 +1,44 @@
 # OHA roadmap
 
-Version numbers are purely numeric; no alpha/beta/rc suffixes. Milestone completion always triggers mandatory complete repository-wide audit, deep refactor/review and verified all-platform gates (`AGENTS.md`).
+Versions are **numeric only**, no alpha/beta/rc suffixes. After every milestone, `AGENTS.md` mandates two full repository-wide audit/review/refactoring passes plus final cross-platform verification.
 
 ## M0: Architecture & Research (ACTIVE)
 
-Deliverables:
-- [x] Product brand OHA / `.oha` and platform architecture recorded.
-- [x] Architecture, threat model, initial decision engine and format constraints documented.
-- [x] Dependency-free Rust analyzer + selector research scaffold prepared (not yet compiled).
-- [x] Portable benchmark harness and synthetic smoke corpus created; local Python tests executed successfully.
-- [x] Verify Rust 1.89 toolchain and execute Linux x86_64, Windows x64, and macOS arm64 builds, fmt, Clippy and Rust tests (GitHub Actions PR #1).
-- [x] Verify macOS x86_64 runner Rust fmt, Clippy, tests and build (PR #1).
-- [ ] Validate native GUI/FFI targets; bounded Rust C ABI/foreign-caller smoke PASS on four OS runners; native GUI shells under CI review.
-- [ ] Complete real diverse benchmark corpora and independent 7-Zip, ZSTD, XZ/LZMA2 archive baselines with extraction and memory measurements. Initial 9-file/108-roundtrip codec probe and six TAR+ZSTD/XZ runs recorded; independent 7-Zip full/selective extraction and RSS harness under test. Representative holdout and controlled measurements pending.
-- [x] Project-owned source license approved: MPL-2.0 (2026-10-14).
-- [ ] Independently verify actual third-party codec/runtime binary license and redistribution notices for each release (issue #4).
-- [ ] Review/approve v1 `.oha` wire format design and codec registry (actual implementation belongs to M1). Preliminary framing proposal and read-only negative tests prepared.
-- [ ] Minimal native GUI prototypes, compile on Windows/macOS and validate Rust FFI semantics.
-- [ ] Full M0 repository-wide two-pass audit, security review, and final CI evidence.
+- [x] OHA brand and `.oha` extension, offline Rust core, WinUI 3/C# for Windows, SwiftUI/AppKit for macOS and CLI-first Linux architecture fixed.
+- [x] Rust 1.89 workspace analyzed, formatted, linted, tested and built on Linux x64, Windows x64 and macOS ARM64/Intel with protected CI (PR #1 and subsequent exact-main runs).
+- [x] Experimental, bounded Rust C ABI plus ctypes, C# PInvoke, Swift foreign-caller smoke on supported runners (PR #10/#12/#14).
+- [x] Minimal native WinUI and SwiftUI shells compiled, linked and packaged for three target configurations (PR #12/#15); native tests are required by protected `verify`.
+- [x] Baseline real 7-Zip LZMA2 and TAR+ZSTD/XZ archive measurements, full/selected extraction SHA verification, metadata and RSS where measurable; pinned external Canterbury holdout probe (PR #11/#18).
+- [x] Original source license is MPL-2.0, SPDX/inbound contribution policy and source notice in previews (PR #19).
+- [x] Baseline architecture, threat model, draft framing and negative header/footer/frame tests.
+- [ ] **#3** Expand benchmarking coverage and controlled methodology for media/VM/database, cold/warm repeats and honest uncertainty (no OHA archive performance claim).
+- [ ] **#4** Audit exact bundled Windows App SDK/.NET/WinRT and future codec licenses; preserve full required third-party notices and redistributable terms. Preliminary machine inventories available (PR #20).
+- [ ] **#5** Review and approve the complete candidate v1 `.oha` physical/manifest/index/portable-name and codec contracts. Code remains research-only until accepted.
+- [ ] **#6/#16** Verify native previews interactively on physical Windows/macOS devices, record actual build/OS/CPU/UX acceptance.
+- [ ] **#7** Complete both entire-repository exit audit passes and all exact-main cross-platform CI/security checks, with evidence.
 
-Exit: research results with evidence, reviewed architecture/format proposal, demonstrated cross-platform builds/ABI, verified dependencies/licenses, full audit. Until then M0 remains open.
+**M0 exit:** accepted architecture/format proposal and dependency policy, defensible benchmark and platform evidence, GUI device acceptance and two-pass audit. Remain M0 until all gates are met. Do not implement or claim a stable archive writer as part of the preliminary parser probes.
 
 ## M1: Minimal working archive
 
-STORE + ZSTD streaming codec, standalone `.oha` format, indexed file tree, CLI pack/list/extract/test, bounded extraction, independent conformance tests and native minimal Windows/macOS GUI calling shared API. No unsupported security claims.
+Approved standalone `.oha` STORE+ZSTD streaming writer/reader, indexed file tree, CLI pack/list/extract/test, bounded extraction, independent conformance vectors and native minimal GUI calling the same core. No unsupported security or stable-format claim until tested.
 
 ## M2: Adaptive archive compression
 
-Sample-based selection, calibrated candidate set, LZMA2 after legal review, bounded solid groups/dictionaries, robust fallback; compare to simple ZSTD/7z baselines on independent datasets.
+Measured sample-based codec selection, LZMA2 after licensing review, bounded solid groups and dictionaries; independent held-out comparison to simple ZSTD/7z baselines.
 
 ## M3: Smart Backup
 
-Content-defined chunks (FastCDC candidate), BLAKE3, deduplication, transactional snapshots, safe restoration, interruption/recovery tests; compare to established backup tools.
+FastCDC candidate, BLAKE3, deduplication, transactional snapshots and interruption/recovery tests, reproducible backup comparison.
 
 ## M4: Encryption/security hardening
 
-Reviewed AEAD, Argon2id KDF, metadata authentication/confidentiality, key-handling policy and dedup leakage treatment, independent security tests/audit.
+Reviewed authenticated encryption, Argon2id KDF, protected manifest/index, key handling and dedup leakage policy, independent crypto review.
 
 ## M5: Native desktop completeness
 
-Windows WinUI 3/C# and macOS SwiftUI/AppKit/Swift functional parity, shell integrations, accessibility, localization, large file trees, packaging/notarization/signing. Linux remains full CLI.
+WinUI 3 and SwiftUI/AppKit functional parity, shell integration, accessibility/localization, large file trees, packaging, notarization and code signing; Linux remains full CLI.
 
 ## M6: Optimization and production release
 
-Cross-platform benchmark regression suite, fuzz coverage, deterministic conformance corpus, packaging, signed release with provenance and common version, full repository-wide exit audit.
+Platform benchmark regression, fuzz/conformance corpus, provenance and signed packaging, final release audit. Every milestone has its own two-pass repository-wide exit audit.
