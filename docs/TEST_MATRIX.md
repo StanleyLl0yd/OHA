@@ -13,7 +13,7 @@
 
 Protected GitHub `verify` requires the four Rust runners, Python, Semgrep, Gitleaks, Dependency Review on PRs, WinUI compile+PInvoke and both macOS SwiftUI+foreign-caller smoke. CodeQL runs separately for Rust/Python/Actions/C#/Swift. These checks are compilation and ABI correctness, **not** safe archive extraction or graphical-device acceptance.
 
-M0 format research currently validates candidate header/footer, DATA/MNFT/INDX framing and CRC/budgets, but no real archive writer/reader or compressed DATA verifier exists. PR #21 and #22 investigate envelope integrity and portable names; they require accepted format/OS semantics before being used in production.
+M0 format research currently validates candidate header/footer, DATA/MNFT/INDX framing and CRC/budgets, but no real archive writer/reader or compressed DATA verifier exists. PR #21 and #22 added bounded physical envelope integrity and portable-name research. PR #24 proposes deterministic CBOR metadata. All need accepted format/OS semantics before production use.
 
 ## M1 and later correctness requirements
 

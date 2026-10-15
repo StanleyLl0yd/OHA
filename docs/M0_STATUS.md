@@ -16,7 +16,7 @@
 | Python/SAST/supply chain | Rust CI, Python regression, Semgrep, Gitleaks, Dependency Review (PR), 5-language CodeQL; SHA-pinned Actions | PASS on baseline main |
 | Independent compression reference | PR #11/#18: 7-Zip LZMA2 solid/non-solid, TAR+XZ/ZSTD, SHA-256 roundtrip and selected-file extract on source-controlled/provenance-pinned corpora | PASS exploratory measurements only |
 | Binary inventory | PR #20: manifest SHA-256 + source provenance from real Windows/macOS artifact, candidate native dependency list | PASS inventory; **not** release legal clearance |
-| Format research | PR #13: header/footer and frame CRC/limits; PR #21 and #22 are further proposals under review | Research only; no full archive conformance |
+| Format research | PR #13: header/footer and frame CRC/limits; PR #21 and PR #22 merged in main (physical envelope and portable-path research, not approved format); PR #24 is a further deterministic CBOR metadata proposal under review | Research only; no full archive conformance |
 
 ## OPEN M0 exit blockers
 
