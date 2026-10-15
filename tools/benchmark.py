@@ -53,6 +53,15 @@ def _copy_stream(src: Path, dst: Path) -> float:
     return (time.perf_counter() - start) * 1000
 
 
+
+def codec_version_banner(stdout: str, stderr: str) -> str:
+    """Capture a nonblank version banner from stdout or stderr."""
+    for line in (stdout + "\n" + stderr).splitlines():
+        if line.strip():
+            return line.strip()[:250]
+    raise RuntimeError("empty compression codec version banner")
+
+
 def measure_file(path: Path, repetitions: int = 1, codec_names: list[str] | None = None) -> list[dict]:
     if repetitions < 1:
         raise ValueError("repetitions must be positive")
@@ -188,7 +197,9 @@ def main(argv: list[str] | None = None) -> int:
             binary = pair[0][0]
             if binary not in result["tool_versions"]:
                 version = subprocess.run([binary, "--version"], capture_output=True, text=True, timeout=5)
-                result["tool_versions"][binary] = (version.stdout or version.stderr).strip().splitlines()[0][:250]
+                if version.returncode != 0:
+                    raise RuntimeError(f"cannot identify {binary} codec version")
+                result["tool_versions"][binary] = codec_version_banner(version.stdout, version.stderr)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"Results: {args.output} ({len(files)} files)")
