@@ -76,10 +76,14 @@ pub fn choose(
             let size_b = b.total_bytes().unwrap_or(u64::MAX);
             match profile {
                 Profile::Fast => {
-                    (a.encode_ms, size_a, a.decode_ms, a.codec.tie_rank()).cmp(&(b.encode_ms, size_b, b.decode_ms, b.codec.tie_rank()))
+                    let left = (a.encode_ms, size_a, a.decode_ms, a.codec.tie_rank());
+                    let right = (b.encode_ms, size_b, b.decode_ms, b.codec.tie_rank());
+                    left.cmp(&right)
                 }
                 Profile::Maximum => {
-                    (size_a, a.encode_ms, a.decode_ms, a.codec.tie_rank()).cmp(&(size_b, b.encode_ms, b.decode_ms, b.codec.tie_rank()))
+                    let left = (size_a, a.encode_ms, a.decode_ms, a.codec.tie_rank());
+                    let right = (size_b, b.encode_ms, b.decode_ms, b.codec.tie_rank());
+                    left.cmp(&right)
                 }
                 Profile::Balanced => {
                     let denominator_bytes = input_bytes.max(1) as f64;
