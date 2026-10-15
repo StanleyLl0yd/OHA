@@ -33,6 +33,10 @@ Simple weighted cost for an optional preference profile, with dimensionally norm
 
 Hard constraints are **not** replaced by this weighted score. Zero/unknown budgets must be handled explicitly. Estimate uncertainty using holdout blocks and never assign fake precision.
 
+## Deterministic tie behavior (M0 research)
+
+For candidates that have exactly the same profile ranking metric, ranking must not depend on the caller's candidate array order. The current research selector uses lower decoding latency when `Balanced` otherwise ties, then a stable codec tie order `STORE`, `ZSTD`, `LZMA2`, `BZip3`. For `Fast` and `Maximum`, the codec tie rank is applied only after all their measured time/size keys are equal. This ordering is a *tie policy*, not an assertion about codec quality or license readiness. Hard resource ceilings and checked total sizes remain mandatory.
+
 ## Initial candidate policies (hypotheses to test)
 
 | Signals | Candidate list |
