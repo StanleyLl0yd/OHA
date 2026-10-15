@@ -127,3 +127,99 @@ def validate_frame_header(
         "block_id": block_id,
         "codec": codec,
     }
+
+
+# Full-byte-envelope research probe. It does not decode a manifest or compressed data.
+import hashlib
+
+RESEARCH_MAX_ENVELOPE_BYTES = 64 * 1024 * 1024
+RESEARCH_MAX_METADATA_BYTES = 4 * 1024 * 1024
+RESEARCH_MAX_DATA_FRAMES = 4096
+
+
+def validate_candidate_envelope(
+    data: bytes,
+    *,
+    max_archive_bytes: int = RESEARCH_MAX_ENVELOPE_BYTES,
+    max_metadata_bytes: int = RESEARCH_MAX_METADATA_BYTES,
+    max_data_frames: int = RESEARCH_MAX_DATA_FRAMES,
+) -> dict[str, int]:
+    """Validate physical framing, checksums and STORE blocks of an unapproved proposal.
+
+    Compressed DATA contents, manifest/index schemas, filesystem paths and archive
+    semantics are intentionally NOT validated. Never use this for extraction.
+    """
+    if max_archive_bytes < HEADER_BYTES + FOOTER_BYTES or max_metadata_bytes < 0 or max_data_frames < 0:
+        raise ValueError("invalid research resource ceilings")
+    if len(data) > max_archive_bytes:
+        raise ProposalFormatError("archive resource budget exceeded")
+    if len(data) < HEADER_BYTES + FOOTER_BYTES:
+        raise ProposalFormatError("candidate envelope truncated")
+    validate_header(data[:HEADER_BYTES])
+    footer_at = len(data) - FOOTER_BYTES
+    footer_raw = data[footer_at:]
+    footer = validate_footer(footer_raw, len(data))
+    manifest_at = footer["manifest_at"]
+    index_at = footer["index_at"]
+    metadata = (("MNFT", manifest_at, footer["manifest_bytes"], footer_raw[56:88]),
+                ("INDX", index_at, footer["index_bytes"], footer_raw[88:120]))
+
+    def record(at: int, boundary: int, budget: int) -> tuple[dict[str, int | str], int, bytes]:
+        if boundary - at < FRAME_HEADER_BYTES:
+            raise ProposalFormatError("incomplete candidate frame header or gap")
+        raw = data[at:at + FRAME_HEADER_BYTES]
+        header = validate_frame_header(raw, max_payload_bytes=budget)
+        length = header["payload_bytes"]
+        assert isinstance(length, int)
+        if length > boundary - at - FRAME_HEADER_BYTES:
+            raise ProposalFormatError("candidate frame crosses boundary")
+        end = at + FRAME_HEADER_BYTES + length
+        payload = data[at + FRAME_HEADER_BYTES:end]
+        return header, end, payload
+
+    seen: set[int] = set()
+    data_count = 0
+    verified_store = 0
+    unverified_compressed = 0
+    position = HEADER_BYTES
+    while position < manifest_at:
+        if data_count >= max_data_frames:
+            raise ProposalFormatError("DATA frame count resource limit")
+        header, position_end, payload = record(position, manifest_at, RESEARCH_MAX_FRAME_PAYLOAD)
+        if header["kind"] != "DATA":
+            raise ProposalFormatError("unexpected non-DATA frame before manifest")
+        block_id = header["block_id"]
+        assert isinstance(block_id, int)
+        if block_id in seen:
+            raise ProposalFormatError("duplicate DATA block ID")
+        seen.add(block_id)
+        if header["codec"] == 0:
+            if hashlib.sha256(payload).digest() != data[position + 40:position + 72]:
+                raise ProposalFormatError("STORE DATA SHA-256 mismatch")
+            verified_store += 1
+        else:
+            # No ZSTD decoding here, even if the compressed frame header is structurally valid.
+            unverified_compressed += 1
+        data_count += 1
+        position = position_end
+    if position != manifest_at:
+        raise ProposalFormatError("DATA sequence not contiguous")
+
+    for expected_kind, at, length, footer_hash in metadata:
+        if length > max_metadata_bytes + FRAME_HEADER_BYTES:
+            raise ProposalFormatError("metadata resource budget exceeded")
+        boundary = at + length
+        header, end, payload = record(at, boundary, max_metadata_bytes)
+        if header["kind"] != expected_kind or end != boundary:
+            raise ProposalFormatError("metadata kind or physical frame length mismatch")
+        actual = hashlib.sha256(payload).digest()
+        if actual != data[at + 40:at + 72] or actual != footer_hash:
+            raise ProposalFormatError("metadata SHA-256 mismatch")
+
+    return {
+        "archive_bytes": len(data),
+        "data_frames": data_count,
+        "store_payloads_sha256_verified": verified_store,
+        "zstd_payloads_NOT_verified": unverified_compressed,
+        "metadata_payloads_sha256_verified": 2,
+    }
