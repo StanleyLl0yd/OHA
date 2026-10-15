@@ -40,10 +40,10 @@ class BaselineTests(unittest.TestCase):
 
     def test_codec_version_banner(self):
         with patch.object(base.subprocess, "run", return_value=SimpleNamespace(
-                returncode=0, stdout="\\n", stderr="  xz 5.6.0\\n")):
+                returncode=0, stdout="\n", stderr="  xz 5.6.0\n")):
             self.assertEqual(base.codec_version("xz"), "xz 5.6.0")
         with patch.object(base.subprocess, "run", return_value=SimpleNamespace(
-                returncode=0, stdout="   ", stderr="\\n")):
+                returncode=0, stdout="   ", stderr="\n")):
             with self.assertRaisesRegex(RuntimeError, "empty"):
                 base.codec_version("xz")
 
