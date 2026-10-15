@@ -161,6 +161,8 @@ def validate_candidate_envelope(
     footer = validate_footer(footer_raw, len(data))
     manifest_at = footer["manifest_at"]
     index_at = footer["index_at"]
+    if index_at != manifest_at + footer["manifest_bytes"]:
+        raise ProposalFormatError("gap between MNFT and INDX frames")
     metadata = (("MNFT", manifest_at, footer["manifest_bytes"], footer_raw[56:88]),
                 ("INDX", index_at, footer["index_bytes"], footer_raw[88:120]))
 
