@@ -55,7 +55,6 @@ class Baseline7ZipTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "missing"):
                 base.verify_extract(root, expected)
 
-
     def test_version_banner_skips_leading_blank_lines(self):
         self.assertEqual(
             base.version_banner("\n\n7-Zip (a) 24.09\nMore information\n"),
@@ -79,10 +78,14 @@ class Baseline7ZipTests(unittest.TestCase):
             root.mkdir()
             (root / "a.txt").write_bytes(b"abc" * 200)
             (root / "b.txt").write_bytes(b"hello" * 10)
+            (root / "large.bin").write_bytes(b"0123456789abcdef" * (96 * 1024))
             files = sorted(root.iterdir())
             result = base.measure(root, files, sevenzip="7z", repetitions=1)
             self.assertEqual(len(result["runs"]), 2)
             self.assertTrue(all(x["integrity"].endswith("verified") for x in result["runs"]))
+            self.assertTrue(all(x["selective_input_bytes"] >= 0 for x in result["runs"]))
+            self.assertEqual(result["method"]["selected_file_mode"],
+                             "extract-to-disk-and-streaming-SHA256")
 
 
 if __name__ == "__main__":
