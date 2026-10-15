@@ -69,6 +69,22 @@ class HarnessTests(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
+class VersionBannerTests(unittest.TestCase):
+    def test_stdout_or_stderr_version(self):
+        self.assertEqual(
+            benchmark.codec_version_banner("\n  ", "\n  xz 5.6.0\n"),
+            "xz 5.6.0",
+        )
+        self.assertEqual(
+            benchmark.codec_version_banner("zstd v1.5.7\n", ""),
+            "zstd v1.5.7",
+        )
+
+    def test_blank_version_does_not_index_empty_list(self):
+        with self.assertRaisesRegex(RuntimeError, "empty"):
+            benchmark.codec_version_banner(" \n", "\t\n")
+
+
 class HarnessBoundaryTests(unittest.TestCase):
     def test_file_count_limit(self):
         with tempfile.TemporaryDirectory() as directory:
