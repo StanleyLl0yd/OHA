@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 import platform
@@ -19,8 +18,6 @@ from pathlib import Path
 
 import benchmark
 
-
-MAX_RANDOM_FILE_BYTES = 1024 * 1024
 
 
 def input_manifest(root: Path, files: list[Path]) -> dict[str, dict]:
@@ -54,7 +51,7 @@ def verify_extract(root: Path, expected: dict[str, dict]) -> None:
         raise RuntimeError("missing files after extraction")
 
 
-def timed_run(args: list[str], cwd: Path, timeout: int, capture_stdout: bool = False) -> dict:
+def timed_run(args: list[str], cwd: Path, timeout: int) -> dict:
     # GNU time measures the child process peak RSS without conflating prior runs.
     with tempfile.TemporaryDirectory(prefix="oha-rss-") as temp:
         rss_path = Path(temp) / "rss.txt"
@@ -63,15 +60,14 @@ def timed_run(args: list[str], cwd: Path, timeout: int, capture_stdout: bool = F
                    if use_gnu_time else args)
         start = time.perf_counter()
         completed = subprocess.run(wrapped, cwd=cwd,
-                                   stdout=subprocess.PIPE if capture_stdout else subprocess.DEVNULL,
+                                   stdout=subprocess.DEVNULL,
                                    stderr=subprocess.PIPE, timeout=timeout, check=False)
         elapsed_ms = round((time.perf_counter() - start) * 1000, 3)
         if completed.returncode != 0:
             detail = completed.stderr.decode("utf-8", "replace")[-1200:]
             raise RuntimeError(f"7z subprocess failed ({completed.returncode}): {detail}")
         rss = int(rss_path.read_text().strip()) if use_gnu_time else None
-        return {"elapsed_ms": elapsed_ms, "peak_rss_kib": rss,
-                "stdout": completed.stdout if capture_stdout else None}
+        return {"elapsed_ms": elapsed_ms, "peak_rss_kib": rss}
 
 
 
@@ -91,10 +87,15 @@ def measure(root: Path, files: list[Path], *, sevenzip: str, repetitions: int = 
         raise FileNotFoundError(f"7-Zip executable not found: {sevenzip}")
     expected = input_manifest(root, files)
     total_input = sum(v["bytes"] for v in expected.values())
-    random_target = next((name for name, meta in expected.items()
-                          if meta["bytes"] <= MAX_RANDOM_FILE_BYTES), None)
-    if random_target is None:
-        raise ValueError("need at least one file <= 1 MiB for bounded random extraction")
+    # For each repetition use the same independently selected target in both
+    # solid modes. Hash extracted files on disk so memory use is bounded even
+    # when all corpus files are large (database/VM/media benchmarks).
+    selection_rng = random.Random(314159)
+    targets = sorted(expected)
+    selected_by_repetition = {
+        number: selection_rng.choice(targets)
+        for number in range(1, repetitions + 1)
+    }
     version = subprocess.run([sevenzip, "i"], capture_output=True, text=True,
                              timeout=30, check=False)
     if version.returncode != 0:
@@ -124,18 +125,23 @@ def measure(root: Path, files: list[Path], *, sevenzip: str, repetitions: int = 
             start_verify = time.perf_counter()
             verify_extract(unpacked, expected)
             verify_ms = round((time.perf_counter() - start_verify) * 1000, 3)
-            target_meta = expected[random_target]
-            selective = timed_run(common[:1] + ["x", "-so"] + common[1:] +
-                                  [str(archive), random_target], root, timeout, capture_stdout=True)
-            output = selective.pop("stdout")
-            if len(output) != target_meta["bytes"] or hashlib.sha256(output).hexdigest() != target_meta["sha256"]:
-                raise RuntimeError("random-file extraction did not match SHA-256")
+            random_target = selected_by_repetition[repetition]
+            selected = scratch / "selected"
+            if selected.exists():
+                shutil.rmtree(selected)
+            selected.mkdir()
+            selective = timed_run(common[:1] + ["x", "-y", "-o" + str(selected)] +
+                                  common[1:] + [str(archive), random_target], root, timeout)
+            # Never buffer selected contents in the benchmark process. This also
+            # detects unexpected files or links, not just a matching content hash.
+            verify_extract(selected, {random_target: expected[random_target]})
             records.append({"repetition": repetition, "solid": solid,
                             "archive_bytes": compressed_bytes, "input_bytes": total_input,
                             "encode_ms": packed["elapsed_ms"], "encode_peak_rss_kib": packed["peak_rss_kib"],
                             "extract_all_ms": extracted["elapsed_ms"], "extract_peak_rss_kib": extracted["peak_rss_kib"],
                             "verify_ms": verify_ms, "selective_file": random_target,
                             "selective_ms": selective["elapsed_ms"],
+                            "selective_input_bytes": expected[random_target]["bytes"],
                             "selective_peak_rss_kib": selective["peak_rss_kib"],
                             "integrity": "all files and selective SHA-256 verified"})
     return {"schema_version": 1, "kind": "independent_7zip_LZMA2_archive_baseline_NOT_OHA",
@@ -145,6 +151,8 @@ def measure(root: Path, files: list[Path], *, sevenzip: str, repetitions: int = 
                             "machine": platform.machine(), "gnu_time_rss": sys.platform.startswith("linux") and Path("/usr/bin/time").exists()},
             "method": {"archive": "7z", "codec": "LZMA2", "level": 5, "threads": 1,
                        "repetitions": repetitions, "run_order_seed": 271828,
+                       "selected_file_seed": 314159,
+                       "selected_file_mode": "extract-to-disk-and-streaming-SHA256",
                        "cache_control": "uncontrolled warm/variable", "source": "user-selected local directory"},
             "corpus": expected, "runs": records}
 
