@@ -1,27 +1,29 @@
 # Test matrix and compatibility contract
 
-## M0 required validation (not yet completed)
+## M0 verified cross-platform CI
 
-| Target | Compile | Tests | GUI | Status |
+| Target | Rust fmt/Clippy/test/build | Foreign caller | Native GUI compilation | Device launch |
 |---|---|---|---|---|
-| Linux x86_64 Rust CLI | cargo build | fmt, clippy, unit tests | Not required | CI PASS (PR #1) |
-| Windows x64 Rust CLI | cargo build | unit/FFI validation | WinUI prototype | Rust FFI + WinUI CI PASS; C# PInvoke runtime smoke under CI validation |
-| macOS arm64 Rust CLI | cargo build | unit/FFI validation | SwiftUI/AppKit prototype | Rust FFI, SwiftUI/AppKit build and Swift foreign-caller smoke PASS |
-| macOS x86_64 Rust CLI | cargo build | unit/FFI validation | Same universal app | Rust FFI CI PASS; SwiftUI/AppKit compilation under test |
-| Windows ARM64 | Optional first release | Core tests where supported | Deferred official tier | Planned |
-| Linux ARM64 | Optional first release | Core tests where supported | Not required | Planned |
+| Linux x64 | PASS | Python ctypes PASS | Not required | Not required |
+| Windows x64 | PASS | Python ctypes + C# PInvoke PASS | WinUI 3 PASS | Pending #16 |
+| macOS ARM64 | PASS | Python ctypes + Swift PASS | SwiftUI/AppKit PASS | Pending #16 |
+| macOS Intel | PASS | Python ctypes + Swift PASS | SwiftUI/AppKit PASS | Pending #16 |
+| Windows ARM64 | Not official initial target | Not verified | Deferred | Deferred |
+| Linux ARM64 | Not official initial target | Not verified | CLI-only future | Deferred |
 
-## M1+ archive correctness
+Protected GitHub `verify` requires the four Rust runners, Python, Semgrep, Gitleaks, Dependency Review on PRs, WinUI compile+PInvoke and both macOS SwiftUI+foreign-caller smoke. CodeQL runs separately for Rust/Python/Actions/C#/Swift. These checks are compilation and ABI correctness, **not** safe archive extraction or graphical-device acceptance.
 
-- Create `.oha` on each supported platform, decode on every other platform and byte-compare all restored regular files.
-- Include filenames with normalization/case collisions, symlink attacks, long names, UNC/drive ambiguities, non-UTF-8 POSIX bytes, giant sparse files and platform metadata with nonrepresentable targets.
-- All codecs and feature combinations included in mandatory decoder must work on x64 and ARM64 or be explicitly disallowed before creating incompatible archives.
-- Archive commit interruption tests at every index/footer write boundary; no old snapshot can become inaccessible without clear recoverable corruption.
-- Fuzz individual format header, record and manifest parsers; ensure bounded time, memory, recursion and output.
-- Encryption release requires independent cryptographic review and test vectors including wrong password, modified ciphertext and nonce uniqueness.
+M0 format research currently validates candidate header/footer, DATA/MNFT/INDX framing and CRC/budgets, but no real archive writer/reader or compressed DATA verifier exists. PR #21 and #22 added bounded physical envelope integrity and portable-name research. PR #24 proposes deterministic CBOR metadata. All need accepted format/OS semantics before production use.
 
-## Performance comparison
+## M1 and later correctness requirements
 
-Full and random access extraction, encoder time, decode time, peak RSS, archive bytes **including metadata**, repeatability, warm/cold caching, and heterogeneous corpora. Use declared baselines and record negative outcomes.
+- Create `.oha` on every supported platform, decode on each other and SHA-256 compare all restored regular files.
+- Reject traversal, symlinks/TOCTOU, Unicode/Windows name collisions, device/ADS, non-UTF-8 POSIX names and unsupported metadata explicitly; use descriptor-relative safe extraction or platform-equivalent primitives.
+- All mandatory codecs/features decode identically on x64/ARM64 or are explicitly unsupported in encoder before creating incompatible archives.
+- Bounded time, RAM, total decompression size, file count, depth and record allocations; fuzz headers, index, manifest, records and extraction path handling.
+- Interrupted writes must preserve previously completed archives and report errors without silent data loss; later snapshot recovery follows M3 only.
+- M4 encryption adds independent cryptographic review, tampered-ciphertext, wrong-password and key/nonce uniqueness tests.
 
-- M0 format proposal: read-only physical envelope and footer/record checks with SHA-256 for STORE and MNFT/INDX, negative tests for duplicates, tampering and resource ceilings. ZSTD payload bytes are **not** decoded or verified. No production parser, writer, manifest semantics, extraction or stable-format claim.
+## Performance comparisons
+
+Measure real packed archive bytes **including metadata** and independent 7-Zip/ZSTD/XZ baselines; report full/selected extraction, encoding, decoding, peak RSS, cold/warm cache, held-out heterogeneous corpora and negative outcomes. No claim of actual OHA archive performance until M1 writer exists.

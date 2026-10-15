@@ -35,7 +35,7 @@ All lengths and offsets must be checked with overflow-safe arithmetic **before r
 - Encryption envelope and nonce domain separation, KDF memory policies, metadata confidentiality and dedup privacy.
 - Maximum sizes and limits, independent verification decoder and cross-platform golden vectors.
 
-**Exit condition:** approved written spec + encoder/decoder prototypes + invalid corpus/fuzz tests + cross-OS conformance. Until then `.oha` is reserved naming only.
+**M0 design gate:** owner-approved written wire proposal and codec registry, explicit path/metadata/resource policies and negative bounded research vectors. **Before publishing any stable wire format in M1 or later:** independently implemented encoder/decoder prototypes, invalid corpus/fuzz checks and cross-OS end-to-end conformance. Until then `.oha` is reserved naming only.
 
 ## Concrete proposal for review (not approved)
 
