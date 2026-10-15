@@ -23,3 +23,5 @@
 ## Performance comparison
 
 Full and random access extraction, encoder time, decode time, peak RSS, archive bytes **including metadata**, repeatability, warm/cold caching, and heterogeneous corpora. Use declared baselines and record negative outcomes.
+
+- M0 format proposal: read-only physical envelope and footer/record checks with SHA-256 for STORE and MNFT/INDX, negative tests for duplicates, tampering and resource ceilings. ZSTD payload bytes are **not** decoded or verified. No production parser, writer, manifest semantics, extraction or stable-format claim.
