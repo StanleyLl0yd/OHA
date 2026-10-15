@@ -42,6 +42,28 @@ class OwnedMixedCorpusTests(unittest.TestCase):
                 corpus.generate(target)
             self.assertEqual(original.read_text(encoding="utf-8"), "preserve")
 
+    def test_symlinked_output_is_rejected_without_side_effects(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            actual = parent / "actual"
+            actual.mkdir()
+            link = parent / "redirected"
+            try:
+                link.symlink_to(actual, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("filesystem cannot create symlinks")
+            with self.assertRaisesRegex(ValueError, "symlink"):
+                corpus.generate(link)
+            self.assertEqual(list(actual.iterdir()), [])
+
+    def test_output_regular_file_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "not-a-dir"
+            output.write_bytes(b"do not change")
+            with self.assertRaisesRegex(ValueError, "directory"):
+                corpus.generate(output)
+            self.assertEqual(output.read_bytes(), b"do not change")
+
     def test_generator_has_no_external_corpus_dependency(self):
         with tempfile.TemporaryDirectory() as temporary:
             result = corpus.generate(Path(temporary) / "generated")
