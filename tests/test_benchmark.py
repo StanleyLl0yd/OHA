@@ -32,6 +32,31 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual([benchmark.hash_file(x) for x in first],
                              [benchmark.hash_file(x) for x in second])
 
+    def test_legacy_corpus_generator_never_overwrites(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / "out"
+            target.mkdir()
+            old = target / "sample.rs"
+            old.write_bytes(b"important original source")
+            with self.assertRaisesRegex(ValueError, "empty"):
+                corpus.generate(target)
+            self.assertEqual(old.read_bytes(), b"important original source")
+
+    def test_legacy_generator_rejects_symlinked_output(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / "untouched"
+            target.mkdir()
+            redirect = root / "link"
+            try:
+                redirect.symlink_to(target, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks are unavailable")
+            with self.assertRaisesRegex(ValueError, "symlink"):
+                corpus.generate(redirect)
+            self.assertEqual(list(target.iterdir()), [])
+
     def test_store_roundtrip(self):
         with tempfile.TemporaryDirectory() as directory:
             file = Path(directory) / "sample.dat"
@@ -68,6 +93,22 @@ class HarnessTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class VersionBannerTests(unittest.TestCase):
+    def test_stdout_or_stderr_version(self):
+        self.assertEqual(
+            benchmark.codec_version_banner("\n  ", "\n  xz 5.6.0\n"),
+            "xz 5.6.0",
+        )
+        self.assertEqual(
+            benchmark.codec_version_banner("zstd v1.5.7\n", ""),
+            "zstd v1.5.7",
+        )
+
+    def test_blank_version_does_not_index_empty_list(self):
+        with self.assertRaisesRegex(RuntimeError, "empty"):
+            benchmark.codec_version_banner(" \n", "\t\n")
+
 
 class HarnessBoundaryTests(unittest.TestCase):
     def test_file_count_limit(self):
