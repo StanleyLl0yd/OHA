@@ -32,6 +32,31 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual([benchmark.hash_file(x) for x in first],
                              [benchmark.hash_file(x) for x in second])
 
+    def test_legacy_corpus_generator_never_overwrites(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / "out"
+            target.mkdir()
+            old = target / "sample.rs"
+            old.write_bytes(b"important original source")
+            with self.assertRaisesRegex(ValueError, "empty"):
+                corpus.generate(target)
+            self.assertEqual(old.read_bytes(), b"important original source")
+
+    def test_legacy_generator_rejects_symlinked_output(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / "untouched"
+            target.mkdir()
+            redirect = root / "link"
+            try:
+                redirect.symlink_to(target, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks are unavailable")
+            with self.assertRaisesRegex(ValueError, "symlink"):
+                corpus.generate(redirect)
+            self.assertEqual(list(target.iterdir()), [])
+
     def test_store_roundtrip(self):
         with tempfile.TemporaryDirectory() as directory:
             file = Path(directory) / "sample.dat"
