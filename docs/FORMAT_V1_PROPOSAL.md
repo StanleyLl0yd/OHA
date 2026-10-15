@@ -93,7 +93,7 @@ The **unapproved** `DATA`, `MNFT`, and `INDX` frame proposal now has a read-only
 
 ## Candidate portable path semantics (research-only)
 
-`tools/candidate_paths.py` and `tests/test_candidate_paths.py` implement a **conservative, non-extracting** manifest path eligibility and collision probe. The candidate requires relative `/`-separated NFC UTF-8, rejects parent traversal, symlinks/special entry types, Windows ADS/drive/reserved device names (including superscript COM/LPT digits, console names `CONIN# Candidate `.oha` wire format v1 (M0 design proposal only)
+`tools/candidate_paths.py` and `tests/test_candidate_paths.py` implement a **conservative, non-extracting** manifest path eligibility and collision probe. The candidate requires relative `/`-separated NFC UTF-8, rejects parent traversal, symlinks/special entry types, Windows ADS/drive/reserved device names (including superscript COM/LPT digits and Win32 console handles `CONIN# Candidate `.oha` wire format v1 (M0 design proposal only)
 
 **UNAPPROVED, NOT STABLE, NOT IMPLEMENTED.** The byte values and structure below are a concrete review proposal, *not* a public format, commitment, or a compatible file writer. Do not publish `.oha` files from these layouts or implement an encoder before the owner signs off. The canonical constraints in `FORMAT_DRAFT.md` continue to apply.
 
@@ -188,7 +188,7 @@ The **unapproved** `DATA`, `MNFT`, and `INDX` frame proposal now has a read-only
 
 ## Candidate portable path semantics (research-only)
 
-`tools/candidate_paths.py` and `tests/test_candidate_paths.py` implement a **conservative, non-extracting** manifest path eligibility and collision probe. The candidate requires relative `/`-separated NFC UTF-8, rejects parent traversal, symlinks/special entry types, Windows ADS/drive/reserved device names (/`CONOUT# Candidate `.oha` wire format v1 (M0 design proposal only)
+`tools/candidate_paths.py` and `tests/test_candidate_paths.py` implement a **conservative, non-extracting** manifest path eligibility and collision probe. The candidate requires relative `/`-separated NFC UTF-8, rejects parent traversal, symlinks/special entry types, Windows ADS/drive/reserved device names  / `CONOUT# Candidate `.oha` wire format v1 (M0 design proposal only)
 
 **UNAPPROVED, NOT STABLE, NOT IMPLEMENTED.** The byte values and structure below are a concrete review proposal, *not* a public format, commitment, or a compatible file writer. Do not publish `.oha` files from these layouts or implement an encoder before the owner signs off. The canonical constraints in `FORMAT_DRAFT.md` continue to apply.
 
@@ -283,7 +283,7 @@ The **unapproved** `DATA`, `MNFT`, and `INDX` frame proposal now has a read-only
 
 ## Candidate portable path semantics (research-only)
 
-`tools/candidate_paths.py` and `tests/test_candidate_paths.py` implement a **conservative, non-extracting** manifest path eligibility and collision probe. The candidate requires relative `/`-separated NFC UTF-8, rejects parent traversal, symlinks/special entry types, Windows ADS/drive/reserved device names (, and conservatively `CLOCK# Candidate `.oha` wire format v1 (M0 design proposal only)
+`tools/candidate_paths.py` and `tests/test_candidate_paths.py` implement a **conservative, non-extracting** manifest path eligibility and collision probe. The candidate requires relative `/`-separated NFC UTF-8, rejects parent traversal, symlinks/special entry types, Windows ADS/drive/reserved device names , plus the conservatively blocked `CLOCK# Candidate `.oha` wire format v1 (M0 design proposal only)
 
 **UNAPPROVED, NOT STABLE, NOT IMPLEMENTED.** The byte values and structure below are a concrete review proposal, *not* a public format, commitment, or a compatible file writer. Do not publish `.oha` files from these layouts or implement an encoder before the owner signs off. The canonical constraints in `FORMAT_DRAFT.md` continue to apply.
 
@@ -378,7 +378,7 @@ The **unapproved** `DATA`, `MNFT`, and `INDX` frame proposal now has a read-only
 
 ## Candidate portable path semantics (research-only)
 
-`tools/candidate_paths.py` and `tests/test_candidate_paths.py` implement a **conservative, non-extracting** manifest path eligibility and collision probe. The candidate requires relative `/`-separated NFC UTF-8, rejects parent traversal, symlinks/special entry types, Windows ADS/drive/reserved device names (), trailing dots/spaces, backslashes, controls, overlong components, duplicate/casefold and file/dir ancestor conflicts. Suggested research caps: 4096 UTF-8 bytes per path, 255 per component, 64 levels and 1 million entries. Exact target filesystem equivalence (especially NTFS/APFS Unicode/case folding and 8.3 aliasing) is **not** modelled; rejecting non-NFC source paths rather than silently rewriting them may make some legitimate POSIX filenames unsupported in M1. These trade-offs still require approval. No filesystem writes or safe extraction claim. See [Microsoft path naming](https://learn.microsoft.com/windows/desktop/FileIO/naming-a-file) and [Unicode normalization FAQ](https://www.unicode.org/faq/normalization.html).
+`tools/candidate_paths.py` and `tests/test_candidate_paths.py` implement a **conservative, non-extracting** manifest path eligibility and collision probe. The candidate requires relative `/`-separated NFC UTF-8, rejects parent traversal, symlinks/special entry types, Windows ADS/drive/reserved device names  stem), trailing dots/spaces, backslashes, controls, overlong components, duplicate/casefold and file/dir ancestor conflicts. Suggested research caps: 4096 UTF-8 bytes per path, 255 per component, 64 levels and 1 million entries. Exact target filesystem equivalence (especially NTFS/APFS Unicode/case folding and 8.3 aliasing) is **not** modelled; rejecting non-NFC source paths rather than silently rewriting them may make some legitimate POSIX filenames unsupported in M1. These trade-offs still require approval. No filesystem writes or safe extraction claim. See [Microsoft path naming](https://learn.microsoft.com/windows/desktop/FileIO/naming-a-file) and [Unicode normalization FAQ](https://www.unicode.org/faq/normalization.html).
 
 ### Extended Win32 console-name negatives (M0)
 
