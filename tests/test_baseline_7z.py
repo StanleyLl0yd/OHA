@@ -94,6 +94,7 @@ class Baseline7ZipTests(unittest.TestCase):
             files = sorted(root.iterdir())
             result = base.measure(root, files, sevenzip="7z", repetitions=1)
             self.assertEqual(len(result["runs"]), 2)
+            self.assertEqual(len({x["selective_file"] for x in result["runs"]}), 1)
             self.assertTrue(all(x["integrity"].endswith("verified") for x in result["runs"]))
             self.assertTrue(all(x["selective_input_bytes"] >= 0 for x in result["runs"]))
             self.assertEqual(result["method"]["selected_file_mode"],
