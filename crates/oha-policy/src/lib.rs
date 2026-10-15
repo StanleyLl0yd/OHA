@@ -178,10 +178,7 @@ mod tests {
             decode_ms: 30,
             ..c(Codec::Store, 400, 5)
         };
-        for candidates in [
-            [fast_decoder, slow_decoder],
-            [slow_decoder, fast_decoder],
-        ] {
+        for candidates in [[fast_decoder, slow_decoder], [slow_decoder, fast_decoder]] {
             assert_eq!(
                 choose(Profile::Balanced, &candidates, LIMIT, 500)
                     .unwrap()
