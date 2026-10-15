@@ -11,6 +11,12 @@ from pathlib import Path
 
 
 def generate(output: Path) -> list[Path]:
+    # This is a smoke-test generator, not a backup/overwrite operation.
+    # Never replace user files or write through a symlinked output directory.
+    if output.is_symlink():
+        raise ValueError("output must not be a symlink")
+    if output.exists() and (not output.is_dir() or any(output.iterdir())):
+        raise ValueError("output must be a real empty directory")
     output.mkdir(parents=True, exist_ok=True)
     rng = random.Random(0x0A0A2026)
     files: list[Path] = []
