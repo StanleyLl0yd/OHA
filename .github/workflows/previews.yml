@@ -60,6 +60,14 @@ jobs:
           $out = Join-Path $env:RUNNER_TEMP "OHA-Windows-x64"
           dotnet publish apps/oha-windows/OHA.Windows.csproj -c Release -p:Platform=x64 -p:RuntimeIdentifier=win-x64 -p:WindowsAppSDKSelfContained=true -p:SelfContained=true -p:PublishSingleFile=false -o $out
           if ($LASTEXITCODE -ne 0) { throw "WinUI publish failed" }
+          # Machine-readable resolved package references are compliance evidence,
+          # not evidence that any binary is licensed for redistribution.
+          $nugetReport = Join-Path $env:RUNNER_TEMP "OHA-M0-Windows-x64-nuget.json"
+          $raw = dotnet package list --project apps/oha-windows/OHA.Windows.csproj --include-transitive --no-restore --format json --output-version 1
+          if ($LASTEXITCODE -ne 0) { throw "NuGet transitive inventory failed" }
+          $raw | Set-Content -LiteralPath $nugetReport -Encoding utf8
+          $parsed = Get-Content -LiteralPath $nugetReport -Raw | ConvertFrom-Json
+          if (-not $parsed.projects -or $parsed.projects.Count -lt 1) { throw "NuGet JSON contained no projects" }
           Copy-Item -LiteralPath "target/release/oha_ffi.dll" -Destination (Join-Path $out "oha_ffi.dll")
           Copy-Item -LiteralPath "LICENSE" -Destination (Join-Path $out "LICENSE")
           Copy-Item -LiteralPath "THIRD_PARTY_NOTICES.md" -Destination (Join-Path $out "THIRD_PARTY_NOTICES.md")
@@ -82,6 +90,7 @@ jobs:
           path: |
             ${{ runner.temp }}/OHA-M0-Windows-x64.zip
             ${{ runner.temp }}/OHA-M0-Windows-x64-inventory.json
+            ${{ runner.temp }}/OHA-M0-Windows-x64-nuget.json
           if-no-files-found: error
           retention-days: 7
 
