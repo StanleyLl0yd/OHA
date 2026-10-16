@@ -26,6 +26,6 @@ Authoritative upstream references:
 - Windows App SDK: https://learn.microsoft.com/en-us/windows/apps/winui
 - SwiftUI/AppKit: https://developer.apple.com/documentation/swiftui/appkit-integration
 
-## Licensing update (2026-10-14)
+## Licensing update (2026-10-16)
 
-Candidate upstream license findings have been checked and summarized in `LICENSING_RESEARCH.md`. The application LICENSE and precise dependency versions remain unresolved.
+Original OHA source licensing is **accepted MPL-2.0**, recorded in root `LICENSE` and `docs/adr/0004-licensing.md`. This is distinct from the **OPEN** exact-version third-party binary redistribution gate (#4). `LICENSING_RESEARCH.md` inventories optional codec candidates and unapproved runtime redistribution obligations; a project source license does not grant vendor-runtime or benchmark-corpus rights. Current pinned manifest/package versions and preview inventory reports are inputs to, not completion of, that separate legal review.
