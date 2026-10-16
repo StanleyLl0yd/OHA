@@ -11,6 +11,7 @@ class LicensingDocumentConsistencyTests(unittest.TestCase):
         research = (ROOT / "docs/LICENSING_RESEARCH.md").read_text(encoding="utf-8")
         adr = (ROOT / "docs/adr/0004-licensing.md").read_text(encoding="utf-8")
         overview = (ROOT / "docs/RESEARCH.md").read_text(encoding="utf-8")
+        bootstrap = (ROOT / "docs/GITHUB_BOOTSTRAP.md").read_text(encoding="utf-8")
         self.assertIn("MPL-2.0", research)
         self.assertIn("MPL-2.0", adr)
         self.assertIn("2026-10-14", research)
@@ -20,6 +21,9 @@ class LicensingDocumentConsistencyTests(unittest.TestCase):
         self.assertIn("accepted MPL-2.0", overview)
         self.assertIn("third-party binary redistribution gate", overview)
         self.assertNotIn("application LICENSE and precise dependency versions remain unresolved", overview)
+        self.assertIn("later on 2026-10-14 the owner approved MPL-2.0", bootstrap)
+        self.assertIn("third-party binary redistribution clearance", bootstrap)
+        self.assertNotIn("No repository LICENSE has been selected.", bootstrap)
         self.assertNotIn("Project license still requires owner approval", research)
         self.assertNotIn("Do not add a `LICENSE` file until approved", research)
 
