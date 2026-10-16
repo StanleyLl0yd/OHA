@@ -20,6 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7175" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
+    <!-- M0 WinUI shell needs UI components, not umbrella ML/AI runtime. -->
+    <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="1.8.260224000" />
+    <!-- Explicit app-level reference for standalone component builds (MS official guidance). -->
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools.MSIX" Version="1.7.20250829.1" />
   </ItemGroup>
 </Project>

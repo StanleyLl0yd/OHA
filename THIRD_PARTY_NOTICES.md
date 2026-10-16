@@ -5,7 +5,7 @@ OHA project-owned source is licensed under [MPL-2.0](LICENSE). **This is a preli
 | Component | Current role | License/distribution status |
 |---|---|---|
 | Local OHA Rust crates | Cargo.lock currently lists four OHA crates, no external crates | Original source MPL-2.0 |
-| Microsoft.WindowsAppSDK 1.8.260317003 | Self-contained Windows x64 preview may bundle proprietary runtime files | Microsoft license and Section 3 redistribution conditions must be checked; https://www.nuget.org/packages/Microsoft.WindowsAppSDK/1.8.260317003/License |
+| Microsoft.WindowsAppSDK.WinUI 1.8.260224000 (new M0 candidate); earlier Microsoft.WindowsAppSDK 1.8.260317003 | Self-contained Windows preview bundles Windows App SDK components; exact payload must be re-inventoried after dependency minimization | Third-party Microsoft license/redistribution conditions and complete notices remain UNREVIEWED; https://www.nuget.org/packages/Microsoft.WindowsAppSDK.WinUI/1.8.260224000/License |
 | Microsoft.Windows.SDK.BuildTools 10.0.26100.7175 | Windows build tool | Verify which components, if any, ship in a preview |
 | .NET/WinRT components | Windows preview runtime | Transitive versions and license files require actual binary inventory |
 | Apple SwiftUI/AppKit | OS frameworks used by macOS preview | Platform terms apply; not relicensed |

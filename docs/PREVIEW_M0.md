@@ -4,6 +4,8 @@ This is an **experimental, unsigned/non-notarized** source-only product prototyp
 
 ## Windows x64
 
+**M0 package-minimization experiment (pending hosted CI/device acceptance):** the Windows shell now references the versioned `Microsoft.WindowsAppSDK.WinUI` 1.8.260224000 component rather than the old `Microsoft.WindowsAppSDK` 1.8.260317003 umbrella metapackage. The preview job fails if transitive `Microsoft.WindowsAppSDK.ML`/`.AI` or their recognizable native ML DLLs are still present. This is an upstream-supported dependency-selection strategy, not binary trimming. Compare the new actual file inventory to the older 512-file run `38883058987` before claiming any size reduction. Independent per-binary licensing, full notices and physical WinUI launch evidence remain unresolved (#40/#16).
+
 The Windows GitHub-hosted runner publishes an unpackaged, self-contained WinUI 3/.NET 10 folder with the matching Rust `oha_ffi.dll`. Extract the `OHA-M0-Windows-x64.zip` preview, keep all files together, and run `OHA.Windows.exe`. No Windows App SDK runtime installer should be necessary for the self-contained output, but the package has **not** been tested on a user desktop. Executables are not Authenticode-signed; SmartScreen warnings may apply. Inspect the GitHub Actions build provenance and `SHA256SUMS.txt` before local evaluation. Preview does not install itself or associate file types.
 
 Official Windows App SDK unpackaged/self-contained guidance: https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/unpackage-winui-app and https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/self-contained-deploy/deploy-self-contained-apps
