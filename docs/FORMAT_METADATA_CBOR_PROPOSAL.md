@@ -12,7 +12,7 @@ All physical header/frame/footer fields in the existing draft are LE. **CBOR int
 
 Root shape: [1, entries], where 1 is schema version and entries are sorted strictly by UTF-8-encoded path bytes.
 
-Each entry: [path, kind, size, segments]. kind=0 regular file, kind=1 directory (size=0, no segments). Each file segment: [block_id, file_offset, decoded_length]. The segments must exactly and consecutively cover [0,size) and reference a complete DATA block, with no deduplication in initial M1. Empty files have no segments. Symlinks, xattrs, ACLs and timestamps are not represented; an eventual writer must explicitly report unsupported metadata or agree on preservation policy before creating an archive.
+Each entry: [path, kind, size, segments]. kind=0 regular file, kind=1 directory (size=0, no segments). Each file segment: [block_id, file_offset, decoded_length]. The segments must exactly and consecutively cover [0,size) and reference a complete DATA block, with no deduplication in initial M1. Empty files have no segments. Symlinks, xattrs, ACLs and timestamps are not represented; an eventual writer must explicitly report unsupported metadata or agree on preservation policy before creating an archive. See [portable metadata decision brief](FORMAT_METADATA_PORTABILITY_REVIEW.md) for concrete owner choices covering file/directory mtime (including pre-epoch times), POSIX executable/permission hints, Windows readonly attributes, error semantics and restoration ordering. **This brief is not accepted format schema or executable code.**
 
 All paths must separately satisfy an approved portable-path policy (PR #22 is an experimental candidate). NFC alone does not solve target-platform collisions or descriptor-relative extraction races.
 
