@@ -27,11 +27,60 @@ class BaselineTests(unittest.TestCase):
             (corpus / "two").write_bytes(b"")
             files = sorted(corpus.iterdir())
             archive = root / "a.tar"
+            original = base.input_manifest(corpus, files)
             base.make_tar(corpus, files, archive)
-            base.verify_tar(archive, corpus, files)
+            base.verify_tar(archive, original)
             (corpus / "one").write_bytes(b"xyz" * 1000)
+            # An intact archive is still validated against its ORIGINAL bytes.
+            base.verify_tar(archive, original)
+            self.assertNotEqual(base.input_manifest(corpus, files), original)
+            changed_archive = root / "changed.tar"
+            base.make_tar(corpus, files, changed_archive)
             with self.assertRaisesRegex(RuntimeError, "SHA-256"):
-                base.verify_tar(archive, corpus, files)
+                base.verify_tar(changed_archive, original)
+
+    def test_duplicate_and_symlink_inputs_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            file = root / "data"
+            file.write_bytes(b"data")
+            with self.assertRaisesRegex(ValueError, "duplicate"):
+                base.input_manifest(root, [file, file])
+            other = root / "elsewhere"
+            other.mkdir()
+            (other / "outside").write_bytes(b"outside")
+            with self.assertRaisesRegex(ValueError, "within"):
+                base.input_manifest(other, [file])
+            link = root / "link"
+            try:
+                link.symlink_to(file)
+            except (NotImplementedError, OSError):
+                pass
+            else:
+                with self.assertRaisesRegex(ValueError, "unsupported"):
+                    base.input_manifest(root, [link])
+
+    @unittest.skipUnless(shutil.which("xz"), "XZ CLI not installed")
+    def test_measure_rejects_mutation_after_tar_was_packed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory)
+            file = source / "original"
+            file.write_bytes(b"abc" * 1000)
+            original_make = base.make_tar
+            mutated = False
+
+            def change_after_pack(root, paths, destination):
+                nonlocal mutated
+                result = original_make(root, paths, destination)
+                if not mutated:
+                    file.write_bytes(b"XYZ" * 1000)
+                    mutated = True
+                return result
+
+            with patch.object(base, "make_tar", side_effect=change_after_pack):
+                with self.assertRaisesRegex(RuntimeError, "source corpus changed"):
+                    base.measure_directory(source, [file], repetitions=1)
+            self.assertTrue(mutated)
 
     def test_empty_corpus_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
