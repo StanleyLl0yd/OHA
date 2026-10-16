@@ -133,7 +133,9 @@ jobs:
           test -n "$old_name"
           install_name_tool -change "$old_name" "@executable_path/../Frameworks/liboha_ffi.dylib" "$app/Contents/MacOS/OHA"
           otool -L "$app/Contents/MacOS/OHA" | grep -F "@executable_path/../Frameworks/liboha_ffi.dylib"
-          codesign --force --deep --sign - "$app"
+          # Sign embedded code first; Apple discourages --deep for signing.
+          codesign --force --sign - "$app/Contents/Frameworks/liboha_ffi.dylib"
+          codesign --force --sign - "$app"
           codesign --verify --deep --strict --verbose=2 "$app"
           # Do not modify the signed .app afterwards. Checksums must be outside it.
           # Cover every signed executable, resource, plist and CodeResources file.
