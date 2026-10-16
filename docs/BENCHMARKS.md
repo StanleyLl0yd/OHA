@@ -25,7 +25,7 @@ The included `tools/benchmark.py` is a **lightweight compression probe**, not a 
 
 Nine real locally installed file samples measured with STORE, ZSTD-3, ZSTD-9 and XZ-3 (three reps each, 108 verified roundtrips). See `research/REAL_PROBE_RESULTS.md`, `research/local-real-corpus-manifest.json` and `research/local-real-probe.json`. These are preliminary codec probes, **not** archive end-to-end or representative holdout measurements.
 
-The bench harness now records input SHA-256, runtime environment and explicit scan/file/total byte limits, and rejects an explicitly empty codec list. The script does not follow input symlinks while discovering corpus files.
+The bench harness records input SHA-256, runtime environment and explicit scan/file/total byte limits, and rejects an explicitly empty codec list. Corpus discovery now **fails closed** on symlinked file/directory entries, non-regular entries, oversized files and an empty corpus instead of silently omitting inputs or reporting a no-data benchmark. Increase the CLI caps intentionally or select a separate corpus; do not describe an unannounced subset as the original dataset. This remains a trusted-input measurement tool and cannot guarantee data remains unchanged between discovery and reading.
 
 `tools/baseline_tar.py` separately generates a deterministic TAR for a whole directory, compresses via external ZSTD or XZ and checks reconstructed TAR plus every member SHA-256. See `research/local-real-tar-baseline.json`. It counts TAR packaging and compression but still lacks random-file retrieval, full scan cost, and memory profiling, and is **not** a 7-Zip baseline.
 
