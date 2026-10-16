@@ -119,6 +119,8 @@ def discover(
         raise FileNotFoundError(root)
     if root.is_symlink():
         raise ValueError("symlink source not allowed")
+    if not root.is_file() and not root.is_dir():
+        raise ValueError("regular input file or directory required")
     if min(max_files, max_file_bytes, max_scan_entries, max_total_bytes) < 1:
         raise ValueError("all limits must be positive")
     candidates = [root] if root.is_file() else root.rglob("*")
@@ -129,16 +131,25 @@ def discover(
         visited += 1
         if visited > max_scan_entries:
             raise ValueError(f"scan entries exceed --max-scan-entries={max_scan_entries}")
-        if candidate.is_symlink() or not candidate.is_file():
+        # Benchmarking a silently filtered subset misrepresents the user's corpus.
+        # Reject all unsupported entries rather than reporting an incomplete baseline.
+        if candidate.is_symlink():
+            raise ValueError(f"symlink entry in benchmark corpus: {candidate}")
+        if candidate.is_dir():
             continue
+        if not candidate.is_file():
+            raise ValueError(f"non-regular entry in benchmark corpus: {candidate}")
         size = candidate.stat().st_size
-        if size <= max_file_bytes:
-            total_bytes += size
-            if total_bytes > max_total_bytes:
-                raise ValueError(f"corpus exceeds --max-total-bytes={max_total_bytes}")
-            files.append(candidate)
-            if len(files) > max_files:
-                raise ValueError(f"file count exceeds --max-files={max_files}")
+        if size > max_file_bytes:
+            raise ValueError(f"file exceeds --max-file-bytes={max_file_bytes}: {candidate}")
+        total_bytes += size
+        if total_bytes > max_total_bytes:
+            raise ValueError(f"corpus exceeds --max-total-bytes={max_total_bytes}")
+        files.append(candidate)
+        if len(files) > max_files:
+            raise ValueError(f"file count exceeds --max-files={max_files}")
+    if not files:
+        raise ValueError("empty benchmark corpus: at least one regular file is required")
     return sorted(files)
 
 
