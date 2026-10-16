@@ -11,6 +11,7 @@ from statistics import median
 
 SEVEN_Z = "independent_7zip_LZMA2_archive_baseline_NOT_OHA"
 TAR = "deterministic_tar_baseline_NOT_oha_or_7z"
+MAX_INPUT_JSON_BYTES = 32 * 1024 * 1024
 METRICS = {
     SEVEN_Z: ("archive_bytes", "encode_ms", "extract_all_ms", "verify_ms",
               "encode_peak_rss_kib", "extract_peak_rss_kib"),
@@ -58,6 +59,8 @@ def summarize(report: dict) -> dict:
     repetitions = method.get("repetitions")
     if type(repetitions) is not int or not 1 <= repetitions <= 20:
         raise BaselineSummaryError("invalid repetition count")
+    if len(rows) > 2 * repetitions:
+        raise BaselineSummaryError("too many baseline runs for supported scenarios")
     groups: dict[str, list[dict]] = {}
     for row in rows:
         if type(row) is not dict:
@@ -117,6 +120,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.output.resolve() == args.source.resolve():
         parser.error("summary must not overwrite raw baseline")
+    if args.source.stat().st_size > MAX_INPUT_JSON_BYTES:
+        parser.error("input JSON exceeds bounded research report limit")
     source = args.source.read_bytes()
     result = summarize(json.loads(source))
     args.output.parent.mkdir(parents=True, exist_ok=True)
