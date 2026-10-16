@@ -30,7 +30,7 @@ def input_manifest(source: Path, files: list[Path]) -> dict[str, tuple[int, str]
         except ValueError as error:
             raise ValueError("TAR input must be within the corpus root") from error
         name = relative.as_posix()
-        if (not name or "\\n" in name or "\\r" in name or name in expected
+        if (not name or "\n" in name or "\r" in name or name in expected
                 or file.is_symlink() or not file.is_file()
                 or any((source / Path(*relative.parts[:i])).is_symlink()
                        for i in range(1, len(relative.parts)))):
