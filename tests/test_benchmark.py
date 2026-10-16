@@ -131,6 +131,12 @@ class HarnessBoundaryTests(unittest.TestCase):
                 benchmark.discover(root, max_files=10, max_file_bytes=2,
                                    max_scan_entries=3)
 
+    def test_empty_corpus_fails_instead_of_claiming_a_benchmark(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with self.assertRaisesRegex(ValueError, "empty benchmark corpus"):
+                benchmark.discover(root, max_files=10, max_file_bytes=100)
+
     def test_total_size_limit(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
