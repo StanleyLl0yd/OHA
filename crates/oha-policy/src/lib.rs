@@ -10,6 +10,18 @@ pub enum Codec {
     Bzip3,
 }
 
+impl Codec {
+    /// Stable tie-break only; not an assertion that a codec compresses better.
+    const fn tie_rank(self) -> u8 {
+        match self {
+            Self::Store => 0,
+            Self::Zstd => 1,
+            Self::Lzma2 => 2,
+            Self::Bzip3 => 3,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum Profile {
     Fast,
@@ -64,10 +76,42 @@ pub fn choose(
             let size_b = b.total_bytes().unwrap_or(u64::MAX);
             match profile {
                 Profile::Fast => {
-                    (a.encode_ms, size_a, a.decode_ms).cmp(&(b.encode_ms, size_b, b.decode_ms))
+                    let left = (
+                        a.encode_ms,
+                        size_a,
+                        a.decode_ms,
+                        a.codec.tie_rank(),
+                        a.decoder_memory_bytes,
+                        a.payload_bytes,
+                    );
+                    let right = (
+                        b.encode_ms,
+                        size_b,
+                        b.decode_ms,
+                        b.codec.tie_rank(),
+                        b.decoder_memory_bytes,
+                        b.payload_bytes,
+                    );
+                    left.cmp(&right)
                 }
                 Profile::Maximum => {
-                    (size_a, a.encode_ms, a.decode_ms).cmp(&(size_b, b.encode_ms, b.decode_ms))
+                    let left = (
+                        size_a,
+                        a.encode_ms,
+                        a.decode_ms,
+                        a.codec.tie_rank(),
+                        a.decoder_memory_bytes,
+                        a.payload_bytes,
+                    );
+                    let right = (
+                        size_b,
+                        b.encode_ms,
+                        b.decode_ms,
+                        b.codec.tie_rank(),
+                        b.decoder_memory_bytes,
+                        b.payload_bytes,
+                    );
+                    left.cmp(&right)
                 }
                 Profile::Balanced => {
                     let denominator_bytes = input_bytes.max(1) as f64;
@@ -80,6 +124,10 @@ pub fn choose(
                         .total_cmp(&score(b))
                         .then_with(|| size_a.cmp(&size_b))
                         .then_with(|| a.encode_ms.cmp(&b.encode_ms))
+                        .then_with(|| a.decode_ms.cmp(&b.decode_ms))
+                        .then_with(|| a.codec.tie_rank().cmp(&b.codec.tie_rank()))
+                        .then_with(|| a.decoder_memory_bytes.cmp(&b.decoder_memory_bytes))
+                        .then_with(|| a.payload_bytes.cmp(&b.payload_bytes))
                 }
             }
         })
@@ -136,6 +184,72 @@ mod tests {
                 .codec,
             Codec::Store
         );
+    }
+
+    #[test]
+    fn stable_codec_tie_is_independent_of_candidate_order() {
+        for profile in [Profile::Fast, Profile::Balanced, Profile::Maximum] {
+            let zstd = c(Codec::Zstd, 400, 5);
+            let store = c(Codec::Store, 400, 5);
+            let left = choose(profile, &[zstd, store], LIMIT, 500).unwrap();
+            let right = choose(profile, &[store, zstd], LIMIT, 500).unwrap();
+            assert_eq!(left.codec, Codec::Store);
+            assert_eq!(right.codec, Codec::Store);
+        }
+    }
+
+    #[test]
+    fn same_codec_ties_are_input_order_independent_for_all_candidate_fields() {
+        for profile in [Profile::Fast, Profile::Balanced, Profile::Maximum] {
+            let low_memory = Candidate {
+                payload_bytes: 398,
+                metadata_bytes: 6,
+                decoder_memory_bytes: 300,
+                ..c(Codec::Zstd, 400, 5)
+            };
+            let high_memory = Candidate {
+                decoder_memory_bytes: 500,
+                ..c(Codec::Zstd, 400, 5)
+            };
+            for candidates in [[high_memory, low_memory], [low_memory, high_memory]] {
+                let selected = choose(profile, &candidates, LIMIT, 500).unwrap();
+                assert_eq!(selected.decoder_memory_bytes, 300);
+                assert_eq!(selected.payload_bytes, 398);
+            }
+            let equal_memory_more_payload = Candidate {
+                payload_bytes: 399,
+                metadata_bytes: 5,
+                ..low_memory
+            };
+            for candidates in [
+                [equal_memory_more_payload, low_memory],
+                [low_memory, equal_memory_more_payload],
+            ] {
+                let selected = choose(profile, &candidates, LIMIT, 500).unwrap();
+                assert_eq!(selected.payload_bytes, 398);
+                assert_eq!(selected.metadata_bytes, 6);
+            }
+        }
+    }
+
+    #[test]
+    fn balanced_equal_score_prefers_lower_decode_cost() {
+        let fast_decoder = Candidate {
+            decode_ms: 2,
+            ..c(Codec::Zstd, 400, 5)
+        };
+        let slow_decoder = Candidate {
+            decode_ms: 30,
+            ..c(Codec::Store, 400, 5)
+        };
+        for candidates in [[fast_decoder, slow_decoder], [slow_decoder, fast_decoder]] {
+            assert_eq!(
+                choose(Profile::Balanced, &candidates, LIMIT, 500)
+                    .unwrap()
+                    .codec,
+                Codec::Zstd
+            );
+        }
     }
 
     #[test]

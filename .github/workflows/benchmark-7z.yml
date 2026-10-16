@@ -82,6 +82,13 @@ jobs:
         run: |
           python3 tools/baseline_7z.py research-corpora/canterbury --output "$RUNNER_TEMP/oha-canterbury-7z-results.json" --repetitions 3
           python3 tools/baseline_tar.py research-corpora/canterbury --output "$RUNNER_TEMP/oha-canterbury-tar-results.json" --repetitions 3
+      - name: Generate rights-clean mixed synthetic workload
+        run: |
+          python3 tools/make_mixed_corpus.py --output "$RUNNER_TEMP/oha-owned-mixed"
+      - name: Benchmark independent codecs on owned mixed workload
+        run: |
+          python3 tools/baseline_7z.py "$RUNNER_TEMP/oha-owned-mixed/files" --output "$RUNNER_TEMP/oha-owned-mixed-7z.json" --repetitions 2
+          python3 tools/baseline_tar.py "$RUNNER_TEMP/oha-owned-mixed/files" --output "$RUNNER_TEMP/oha-owned-mixed-tar.json" --repetitions 2
       - name: Publish raw reproducibility results
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -91,5 +98,8 @@ jobs:
             ${{ runner.temp }}/oha-tar-results.json
             ${{ runner.temp }}/oha-canterbury-7z-results.json
             ${{ runner.temp }}/oha-canterbury-tar-results.json
+            ${{ runner.temp }}/oha-owned-mixed-7z.json
+            ${{ runner.temp }}/oha-owned-mixed-tar.json
+            ${{ runner.temp }}/oha-owned-mixed/corpus-manifest.json
           if-no-files-found: error
           retention-days: 30

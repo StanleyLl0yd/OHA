@@ -2,6 +2,9 @@
 """Tar baseline round-trip verification tests; never use unsafe extractall."""
 
 import importlib.util
+import shutil
+from types import SimpleNamespace
+from unittest.mock import patch
 import sys
 import tempfile
 import unittest
@@ -34,6 +37,31 @@ class BaselineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaises(ValueError):
                 base.measure_directory(Path(directory), [], 1)
+
+    def test_codec_version_banner(self):
+        with patch.object(base.subprocess, "run", return_value=SimpleNamespace(
+                returncode=0, stdout="\n", stderr="  xz 5.6.0\n")):
+            self.assertEqual(base.codec_version("xz"), "xz 5.6.0")
+        with patch.object(base.subprocess, "run", return_value=SimpleNamespace(
+                returncode=0, stdout="   ", stderr="\n")):
+            with self.assertRaisesRegex(RuntimeError, "empty"):
+                base.codec_version("xz")
+
+    @unittest.skipUnless(shutil.which("xz"), "XZ CLI not installed")
+    def test_real_tar_baseline_reproducible_run_order(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory)
+            (source / "a.txt").write_bytes(b"hello " * 120)
+            result = base.measure_directory(source, [source / "a.txt"], repetitions=2)
+            codecs = {record["codec"] for record in result["runs"]}
+            expected = {(n, codec) for n in (1, 2) for codec in codecs}
+            actual = {(record["repetition"], record["codec"]) for record in result["runs"]}
+            self.assertEqual(actual, expected)
+            self.assertEqual(result["method"]["run_order_seed"], 271828)
+            self.assertTrue(result["tool_versions"])
+            self.assertTrue(all(rec["status"] == "sha256-verified" for rec in result["runs"]))
+            self.assertEqual({rec["order_position"] for rec in result["runs"]},
+                             set(range(1, len(result["runs"]) + 1)))
 
     def test_tar_deterministic(self):
         with tempfile.TemporaryDirectory() as directory:
