@@ -19,6 +19,27 @@ from pathlib import Path
 import benchmark
 
 
+def input_manifest(source: Path, files: list[Path]) -> dict[str, tuple[int, str]]:
+    """Pin input bytes once, before any codec/repetition can observe changes."""
+    if source.is_symlink() or not source.is_dir() or not files:
+        raise ValueError("non-symlink directory containing files required")
+    expected: dict[str, tuple[int, str]] = {}
+    for file in files:
+        try:
+            relative = file.relative_to(source)
+        except ValueError as error:
+            raise ValueError("TAR input must be within the corpus root") from error
+        name = relative.as_posix()
+        if (not name or any(part in (".", "..") for part in relative.parts)
+                or "\n" in name or "\r" in name or name in expected
+                or file.is_symlink() or not file.is_file()
+                or any((source / Path(*relative.parts[:i])).is_symlink()
+                       for i in range(1, len(relative.parts)))):
+            raise ValueError("unsupported or duplicate TAR input")
+        expected[name] = (file.stat().st_size, benchmark.hash_file(file))
+    return expected
+
+
 def make_tar(source: Path, files: list[Path], output: Path) -> float:
     started = time.perf_counter()
     with tarfile.open(output, mode="w", format=tarfile.PAX_FORMAT) as archive:
@@ -35,9 +56,8 @@ def make_tar(source: Path, files: list[Path], output: Path) -> float:
     return (time.perf_counter() - started) * 1000
 
 
-def verify_tar(tar_path: Path, source: Path, files: list[Path]) -> None:
-    expected = {file.relative_to(source).as_posix():
-                (file.stat().st_size, benchmark.hash_file(file)) for file in files}
+def verify_tar(tar_path: Path, expected: dict[str, tuple[int, str]]) -> None:
+    """Compare extracted members to the original immutable pre-run manifest."""
     seen = set()
     with tarfile.open(tar_path, mode="r:") as archive:
         for entry in archive:
@@ -80,6 +100,7 @@ def measure_directory(source: Path, files: list[Path], repetitions: int = 3) -> 
         raise ValueError("invalid repetitions")
     if not source.is_dir() or source.is_symlink() or not files:
         raise ValueError("non-symlink directory with nonempty file list required")
+    expected = input_manifest(source, files)
     coders = {name: args for name, args in {
         "TAR+ZSTD-3": (["zstd", "-q", "-T1", "-3", "-c"], ["zstd", "-q", "-d", "-c"]),
         "TAR+XZ-3": (["xz", "-T1", "-3", "-c"], ["xz", "-d", "-c"]),
@@ -107,8 +128,16 @@ def measure_directory(source: Path, files: list[Path], repetitions: int = 3) -> 
                 if benchmark.hash_file(packed_tar) != benchmark.hash_file(restored_tar):
                     raise RuntimeError("tar SHA-256 mismatch after decoder")
                 started = time.perf_counter()
-                verify_tar(restored_tar, source, files)
+                verify_tar(restored_tar, expected)
                 verify_ms = (time.perf_counter() - started) * 1000
+                # This audit is outside measured encode/decode time. The original
+                # sample must not silently change between repeated scenarios.
+                try:
+                    current = input_manifest(source, files)
+                except (OSError, ValueError) as error:
+                    raise RuntimeError("source corpus changed during TAR benchmark") from error
+                if current != expected:
+                    raise RuntimeError("source corpus changed during TAR benchmark")
                 records.append({"codec": name, "repetition": repetition,
                                 "order_position": order,
                                 "tar_bytes": packed_tar.stat().st_size,
@@ -120,14 +149,15 @@ def measure_directory(source: Path, files: list[Path], repetitions: int = 3) -> 
                                 "status": "sha256-verified"})
     return {"schema_version": 1, "kind": "deterministic_tar_baseline_NOT_oha_or_7z",
             "notes": "Reproducibly shuffled codec/repetition order. No RSS/random-file extraction/cold cache controls."
-                     " End-to-end package+encode = tar_build_ms + encode_ms.",
+                     " End-to-end package+encode = tar_build_ms + encode_ms."
+                     " Frozen input SHA-256 verified before every result; changes abort the run.",
             "method": {"run_order_seed": 271828, "repetitions": repetitions,
                        "cache_control": "uncontrolled warm/variable", "threads": 1},
             "environment": {"os": platform.platform(), "machine": platform.machine(),
                             "python": platform.python_version()},
             "tool_versions": versions,
-            "input_files": [{"path": f.relative_to(source).as_posix(),
-                             "size": f.stat().st_size, "sha256": benchmark.hash_file(f)} for f in files],
+            "input_files": [{"path": name, "size": size, "sha256": digest}
+                            for name, (size, digest) in expected.items()],
             "runs": records}
 
 

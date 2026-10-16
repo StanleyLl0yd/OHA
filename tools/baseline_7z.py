@@ -25,9 +25,13 @@ def input_manifest(root: Path, files: list[Path]) -> dict[str, dict]:
     if root.is_symlink() or not root.is_dir() or not files:
         raise ValueError("non-symlink directory containing files required")
     for file in files:
-        rel = file.relative_to(root).as_posix()
-        if ("\n" in rel or "\r" in rel or not rel or rel in result
-                or file.is_symlink() or not file.is_file()):
+        relative = file.relative_to(root)
+        rel = relative.as_posix()
+        if (not rel or any(part in (".", "..") for part in relative.parts)
+                or "\n" in rel or "\r" in rel or rel in result
+                or file.is_symlink() or not file.is_file()
+                or any((root / Path(*relative.parts[:i])).is_symlink()
+                       for i in range(1, len(relative.parts)))):
             raise ValueError("unsupported 7-Zip input filename or file type")
         result[rel] = {"bytes": file.stat().st_size, "sha256": benchmark.hash_file(file)}
     return result
@@ -135,6 +139,14 @@ def measure(root: Path, files: list[Path], *, sevenzip: str, repetitions: int = 
             # Never buffer selected contents in the benchmark process. This also
             # detects unexpected files or links, not just a matching content hash.
             verify_extract(selected, {random_target: expected[random_target]})
+            # Keep the original scenario input stable, including after the
+            # final extraction. Not part of timed encode/decode measurements.
+            try:
+                current = input_manifest(root, files)
+            except (OSError, ValueError) as error:
+                raise RuntimeError("source corpus changed during 7-Zip benchmark") from error
+            if current != expected:
+                raise RuntimeError("source corpus changed during 7-Zip benchmark")
             records.append({"repetition": repetition, "solid": solid,
                             "archive_bytes": compressed_bytes, "input_bytes": total_input,
                             "encode_ms": packed["elapsed_ms"], "encode_peak_rss_kib": packed["peak_rss_kib"],
@@ -153,7 +165,8 @@ def measure(root: Path, files: list[Path], *, sevenzip: str, repetitions: int = 
                        "repetitions": repetitions, "run_order_seed": 271828,
                        "selected_file_seed": 314159,
                        "selected_file_mode": "extract-to-disk-and-streaming-SHA256",
-                       "cache_control": "uncontrolled warm/variable", "source": "user-selected local directory"},
+                       "cache_control": "uncontrolled warm/variable", "source": "user-selected local directory",
+                       "corpus_stability": "original SHA-256 rechecked after each scenario"},
             "corpus": expected, "runs": records}
 
 
