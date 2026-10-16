@@ -6,6 +6,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,6 +24,20 @@ class Baseline7ZipTests(unittest.TestCase):
             good.write_text("abc")
             manifest = base.input_manifest(root, [good])
             self.assertEqual(manifest["hello.txt"]["bytes"], 3)
+            nested = root / "nested"
+            nested.mkdir()
+            with self.assertRaisesRegex(ValueError, "unsupported"):
+                base.input_manifest(nested, [nested / ".." / "hello.txt"])
+            linkdir = root / "symlink-dir"
+            try:
+                linkdir.symlink_to(nested, target_is_directory=True)
+            except (NotImplementedError, OSError):
+                pass
+            else:
+                other = nested / "file"
+                other.write_bytes(b"nested")
+                with self.assertRaisesRegex(ValueError, "unsupported"):
+                    base.input_manifest(root, [linkdir / "file"])
             bad = root / "strange\nname"
             bad.write_bytes(b"x")
             with self.assertRaisesRegex(ValueError, "filename"):
@@ -54,6 +69,29 @@ class Baseline7ZipTests(unittest.TestCase):
             one.unlink()
             with self.assertRaisesRegex(RuntimeError, "missing"):
                 base.verify_extract(root, expected)
+
+    @unittest.skipUnless(shutil.which("7z"), "7-Zip executable not installed")
+    def test_measure_rejects_source_drift_after_selective_extraction(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            file = root / "file"
+            file.write_bytes(b"original" * 1000)
+            original_run = base.timed_run
+            calls = 0
+
+            def mutate_after_selective(*args, **kwargs):
+                nonlocal calls
+                result = original_run(*args, **kwargs)
+                calls += 1
+                if calls == 3:
+                    file.write_bytes(b"modified" * 1000)
+                return result
+
+            with patch.object(base, "timed_run", side_effect=mutate_after_selective):
+                with self.assertRaisesRegex(RuntimeError, "source corpus changed"):
+                    base.measure(root, [file], sevenzip="7z",
+                                 repetitions=1, solid_options=(False,))
+            self.assertEqual(calls, 3)
 
     def test_version_banner_skips_leading_blank_lines(self):
         self.assertEqual(
