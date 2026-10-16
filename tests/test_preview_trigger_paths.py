@@ -46,6 +46,11 @@ class PreviewPathTriggerTests(unittest.TestCase):
         for entry in (
             ".github/workflows/previews.yml",
             "tools/preview_inventory.py",
+            "crates/oha-analysis/**",
+            "Cargo.toml",
+            "Cargo.lock",
+            "rust-toolchain.toml",
+            "scripts/verify_ci_supply_chain.py",
             "LICENSE",
             "THIRD_PARTY_NOTICES.md",
         ):
