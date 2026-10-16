@@ -134,16 +134,24 @@ jobs:
           install_name_tool -change "$old_name" "@executable_path/../Frameworks/liboha_ffi.dylib" "$app/Contents/MacOS/OHA"
           otool -L "$app/Contents/MacOS/OHA" | grep -F "@executable_path/../Frameworks/liboha_ffi.dylib"
           codesign --force --deep --sign - "$app"
-          codesign --verify --deep --verbose=2 "$app"
-          (cd "$app/Contents" && shasum -a 256 MacOS/OHA Frameworks/liboha_ffi.dylib > SHA256SUMS.txt)
+          codesign --verify --deep --strict --verbose=2 "$app"
+          # Do not modify the signed .app afterwards. Checksums must be outside it.
+          # Cover every signed executable, resource, plist and CodeResources file.
+          (cd "$app" && find Contents -type f -print | LC_ALL=C sort | while IFS= read -r rel; do shasum -a 256 "$rel"; done) > "$RUNNER_TEMP/OHA-M0-macOS-SHA256SUMS.txt"
           ditto -c -k --sequesterRsrc --keepParent "$app" "$RUNNER_TEMP/OHA-M0-macOS.zip"
-          python3 tools/preview_inventory.py --root "$app" --platform macos --commit "$GITHUB_SHA" --output "$RUNNER_TEMP/OHA-M0-macOS-inventory.json"
+          # Verify the actual unpacked archive, not only the pre-zip build directory.
+          mkdir -p "$RUNNER_TEMP/oha-preview-unpacked"
+          ditto -x -k "$RUNNER_TEMP/OHA-M0-macOS.zip" "$RUNNER_TEMP/oha-preview-unpacked"
+          unpacked="$RUNNER_TEMP/oha-preview-unpacked/OHA.app"
+          codesign --verify --deep --strict --verbose=2 "$unpacked"
+          python3 tools/preview_inventory.py --root "$unpacked" --platform macos --commit "$GITHUB_SHA" --checksums "$RUNNER_TEMP/OHA-M0-macOS-SHA256SUMS.txt" --output "$RUNNER_TEMP/OHA-M0-macOS-inventory.json"
       - name: Upload ad-hoc macOS preview
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: oha-m0-macos-${{ matrix.os }}-${{ github.sha }}
           path: |
             ${{ runner.temp }}/OHA-M0-macOS.zip
+            ${{ runner.temp }}/OHA-M0-macOS-SHA256SUMS.txt
             ${{ runner.temp }}/OHA-M0-macOS-inventory.json
           if-no-files-found: error
           retention-days: 7
