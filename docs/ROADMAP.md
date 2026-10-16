@@ -12,7 +12,7 @@ Versions are **numeric only**, no alpha/beta/rc suffixes. After every milestone,
 - [x] Original source license is MPL-2.0, SPDX/inbound contribution policy and source notice in previews (PR #19).
 - [x] Baseline architecture, threat model, draft framing and negative header/footer/frame tests.
 - [ ] **#3** Expand benchmarking coverage and controlled methodology for media/VM/database, cold/warm repeats and honest uncertainty (no OHA archive performance claim).
-- [ ] **#4** Audit exact bundled Windows App SDK/.NET/WinRT and future codec licenses; preserve full required third-party notices and redistributable terms. Preliminary machine inventories available (PR #20).
+- [ ] **#40** Audit exact bundled Windows App SDK/.NET/WinRT and future codec licenses; preserve full required third-party notices and redistributable terms. Preliminary machine inventories available (PR #20).
 - [ ] **#5** Review and approve the complete candidate v1 `.oha` physical/manifest/index/portable-name and codec contracts. Code remains research-only until accepted.
 - [ ] **#6/#16** Verify native previews interactively on physical Windows/macOS devices, record actual build/OS/CPU/UX acceptance.
 - [ ] **#7** Complete both entire-repository exit audit passes and all exact-main cross-platform CI/security checks, with evidence.

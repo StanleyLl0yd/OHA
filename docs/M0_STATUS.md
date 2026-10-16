@@ -21,7 +21,7 @@
 ## OPEN M0 exit blockers
 
 1. **#3: Benchmark representativeness.** Extend to precompressed media, database/VM data and holdout sets; record cold/warm cache, noise/dispersion, memory, time and extraction metrics. No claim OHA outperforms anything before a real writer exists.
-2. **#4: Third-party redistribution.** Original code is already MPL-2.0; exact Windows App SDK/.NET/WinRT self-contained licenses and notice/end-user term requirements need a versioned binary-by-binary decision. BZip3 and 7-Zip code remain on hold.
+2. **#40: Third-party binary redistribution.** Original OHA source is already MPL-2.0 and source-license issue #4 was closed by the owner; exact Windows App SDK/.NET/WinRT self-contained licenses and notice/end-user term requirements need a versioned binary-by-binary decision. BZip3 and 7-Zip code remain on hold.
 3. **#5: Format approval.** Decide canonical manifest/index encoding, portable filename semantics, codec/feature registry, quotas, metadata rejection/portability and future version behavior. Candidate read-only research is not a standard. Approval must precede M1 implementation.
 4. **#6 and #16: Native GUI on devices.** WinUI/SwiftUI compilation and FFI calls are confirmed, but there is no physical-device, interactive GUI acceptance. Unsigned M0 artifact provenance must be verified before launching; signing/notarization and production packaging are later gates.
 5. **#7: Mandatory milestone-wide two-pass audit.** Run twice over the *entire* repository, dependencies, source, CI, docs, tests, platform integration, security and candidate format after all preceding gates. Record fixes, intentional no-ops and exact-main final CI. Do not close M0 early.
