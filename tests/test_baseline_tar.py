@@ -46,6 +46,10 @@ class BaselineTests(unittest.TestCase):
             file.write_bytes(b"data")
             with self.assertRaisesRegex(ValueError, "duplicate"):
                 base.input_manifest(root, [file, file])
+            nested = root / "nested"
+            nested.mkdir()
+            with self.assertRaisesRegex(ValueError, "unsupported"):
+                base.input_manifest(nested, [nested / ".." / "data"])
             name_with_newline = root / ("bad" + chr(10) + "name")
             name_with_newline.write_bytes(b"x")
             with self.assertRaisesRegex(ValueError, "unsupported"):
