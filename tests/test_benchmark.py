@@ -66,12 +66,15 @@ class HarnessTests(unittest.TestCase):
             self.assertTrue(all(x["status"] == "ok" for x in rows))
             self.assertTrue(all(x["encoded_bytes"] == file.stat().st_size for x in rows))
 
-    def test_discover_excludes_symlinks_and_large_files(self):
+    def test_discover_rejects_oversized_file_instead_of_silent_omission(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "small").write_bytes(b"hello")
             (root / "large").write_bytes(b"hello world" * 100)
-            self.assertEqual([x.name for x in benchmark.discover(root, 10, 5)], ["small"])
+            with self.assertRaisesRegex(ValueError, "max-file-bytes"):
+                benchmark.discover(root, 10, 5)
+            self.assertEqual([x.name for x in benchmark.discover(root, 10, 2000)],
+                             ["large", "small"])
 
     def test_unknown_codec_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -119,11 +122,11 @@ class HarnessBoundaryTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 benchmark.discover(root, max_files=3, max_file_bytes=128)
 
-    def test_scan_limit_is_enforced_even_for_skipped_files(self):
+    def test_scan_limit_is_enforced_even_for_nested_directories(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             for i in range(5):
-                (root / f"skip-{i}").write_bytes(b"A" * 20)
+                (root / f"dir-{i}").mkdir()
             with self.assertRaisesRegex(ValueError, "scan entries"):
                 benchmark.discover(root, max_files=10, max_file_bytes=2,
                                    max_scan_entries=3)
@@ -144,7 +147,7 @@ class HarnessBoundaryTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 benchmark.measure_file(path, codec_names=[])
 
-    def test_symlink_file_not_included(self):
+    def test_symlink_entry_rejected_instead_of_silently_dropped(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "real").write_bytes(b"hello")
@@ -152,7 +155,20 @@ class HarnessBoundaryTests(unittest.TestCase):
                 (root / "link").symlink_to(root / "real")
             except (OSError, NotImplementedError):
                 self.skipTest("symlinks are not supported on this host")
-            self.assertEqual([x.name for x in benchmark.discover(root, 10, 10)], ["real"])
+            with self.assertRaisesRegex(ValueError, "symlink entry"):
+                benchmark.discover(root, 10, 10)
+
+    def test_symlink_directory_rejected_instead_of_silently_dropped(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "real").mkdir()
+            (root / "real" / "file").write_bytes(b"hello")
+            try:
+                (root / "link").symlink_to(root / "real", target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks are not supported on this host")
+            with self.assertRaisesRegex(ValueError, "symlink entry"):
+                benchmark.discover(root, 10, 10)
 
     def test_cli_output_manifest_records_sha_and_bounds(self):
         with tempfile.TemporaryDirectory() as directory:
