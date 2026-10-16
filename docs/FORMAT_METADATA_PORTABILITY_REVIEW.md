@@ -37,6 +37,12 @@ The chosen **wire representable range**, **decoder resource limits** and **host 
 4. Test empty files/directories, nested directory timestamp restoration after writing children, permission changes, interrupted extraction and symlink/race attacks with real filesystem handles.
 5. Prove exact file-byte round-trip independently of metadata, with truthful reporting of each unsupported attribute rather than silently discarding it.
 
+## Upstream reference points
+
+- [RFC 8949, Sections 3.1 and 4.2](https://www.rfc-editor.org/rfc/rfc8949.html#section-4.2): CBOR major type 1 represents negative integers as `-1 - argument`; deterministic encoding requires minimal integer/length representation. Any new timestamp field must define this precisely.
+- [Microsoft FILETIME specification](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/2c57429b-fdd4-488f-b5fc-9e4cf020fcdf): Windows file times are UTC-relative, in 100 ns units since January 1, 1601. This is why the proposed *signed seconds plus subsecond nanos* representation has a different range/precision trade-off from single signed-64 nanoseconds.
+- [Microsoft file timestamp notes](https://learn.microsoft.com/en-us/windows/win32/sysinfo/file-times): filesystem differences (including NTFS vs FAT local-time handling) require explicit precision/portability error behavior. This is a candidate policy, not an adopted compatibility guarantee.
+
 ## Approval checklist
 
 Owner must explicitly accept or modify the schema version and field ordering, deterministic CBOR subset, time representation and precision, portable mode/readonly policy, unsupported attribute policy, filename restrictions, permanent format maxima vs adjustable reader budgets, and ZSTD/codec compatibility. Only then can independently generated golden bytes and negative test vectors be frozen. The present probes remain research-only, do not extract, and **cannot** authenticate compressed DATA.
