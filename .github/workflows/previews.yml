@@ -101,12 +101,25 @@ jobs:
           Compress-Archive -Path (Join-Path $out "*") -DestinationPath (Join-Path $env:RUNNER_TEMP "OHA-M0-Windows-x64.zip") -Force
           python tools/preview_inventory.py --root $out --platform windows --commit $env:GITHUB_SHA --output (Join-Path $env:RUNNER_TEMP "OHA-M0-Windows-x64-inventory.json")
           if ($LASTEXITCODE -ne 0) { throw "Preview binary inventory verification failed" }
-      - name: Upload unsigned Windows preview
+      # A public repository gives read access to Actions artifacts.
+      # #40 has NOT cleared distribution of bundled proprietary runtime DLLs.
+      - name: Upload private Windows executable preview
+        if: ${{ github.event.repository.private == true }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: oha-m0-winui-x64-${{ github.sha }}
+          name: oha-m0-private-winui-x64-${{ github.sha }}
           path: |
             ${{ runner.temp }}/OHA-M0-Windows-x64.zip
+            ${{ runner.temp }}/OHA-M0-Windows-x64-inventory.json
+            ${{ runner.temp }}/OHA-M0-Windows-x64-nuget.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload public Windows metadata only
+        if: ${{ github.event.repository.private != true }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: oha-m0-public-winui-inventory-${{ github.sha }}
+          path: |
             ${{ runner.temp }}/OHA-M0-Windows-x64-inventory.json
             ${{ runner.temp }}/OHA-M0-Windows-x64-nuget.json
           if-no-files-found: error
@@ -165,12 +178,23 @@ jobs:
           unpacked="$RUNNER_TEMP/oha-preview-unpacked/OHA.app"
           codesign --verify --deep --strict --verbose=2 "$unpacked"
           python3 tools/preview_inventory.py --root "$unpacked" --platform macos --commit "$GITHUB_SHA" --checksums "$RUNNER_TEMP/OHA-M0-macOS-SHA256SUMS.txt" --output "$RUNNER_TEMP/OHA-M0-macOS-inventory.json"
-      - name: Upload ad-hoc macOS preview
+      - name: Upload private macOS executable preview
+        if: ${{ github.event.repository.private == true }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: oha-m0-macos-${{ matrix.os }}-${{ github.sha }}
+          name: oha-m0-private-macos-${{ matrix.os }}-${{ github.sha }}
           path: |
             ${{ runner.temp }}/OHA-M0-macOS.zip
+            ${{ runner.temp }}/OHA-M0-macOS-SHA256SUMS.txt
+            ${{ runner.temp }}/OHA-M0-macOS-inventory.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload public macOS metadata only
+        if: ${{ github.event.repository.private != true }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: oha-m0-public-macos-inventory-${{ matrix.os }}-${{ github.sha }}
+          path: |
             ${{ runner.temp }}/OHA-M0-macOS-SHA256SUMS.txt
             ${{ runner.temp }}/OHA-M0-macOS-inventory.json
           if-no-files-found: error

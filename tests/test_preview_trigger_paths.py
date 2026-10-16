@@ -39,6 +39,25 @@ class PreviewPathTriggerTests(unittest.TestCase):
         self.assertIn('${{ runner.temp }}/OHA-M0-macOS-SHA256SUMS.txt', mac)
         self.assertNotIn('> SHA256SUMS.txt', mac)
 
+    def test_public_actions_never_upload_native_preview_zip(self):
+        source = PREVIEW.read_text(encoding="utf-8")
+        windows, mac = source.split("  macos-preview:", 1)
+        for section, name, executable, inventory in (
+            (windows, "Windows", "OHA-M0-Windows-x64.zip", "OHA-M0-Windows-x64-inventory.json"),
+            (mac, "macOS", "OHA-M0-macOS.zip", "OHA-M0-macOS-inventory.json"),
+        ):
+            with self.subTest(platform=name):
+                private = section.split("- name: Upload private ", 1)[1].split(
+                    "- name: Upload public ", 1)[0]
+                public = section.split("- name: Upload public ", 1)[1]
+                self.assertIn("if: ${{ github.event.repository.private == true }}", private)
+                self.assertIn("if: ${{ github.event.repository.private != true }}", public)
+                self.assertIn(executable, private)
+                self.assertNotIn(executable, public)
+                self.assertIn(inventory, public)
+                self.assertIn("if-no-files-found: error", public)
+                self.assertIn("retention-days: 7", public)
+
     def test_both_events_rebuild_on_compliance_changes(self):
         source = PREVIEW.read_text(encoding="utf-8")
         self.assertIn("  pull_request:\n", source)
