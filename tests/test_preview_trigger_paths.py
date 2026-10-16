@@ -21,6 +21,22 @@ class PreviewPathTriggerTests(unittest.TestCase):
                 self.assertIn(fragment, source)
         self.assertGreaterEqual(source.count("OHA-M0-Windows-x64-nuget.json"), 2)
 
+    def test_macos_preview_verifies_extracted_signed_bundle_without_mutating_it(self):
+        source = PREVIEW.read_text(encoding="utf-8")
+        mac = source.split("  macos-preview:", 1)[1]
+        sign = mac.index("codesign --force --deep --sign -")
+        checksum = mac.index('> "$RUNNER_TEMP/OHA-M0-macOS-SHA256SUMS.txt"')
+        archive = mac.index('ditto -c -k --sequesterRsrc --keepParent')
+        extract = mac.index('ditto -x -k "$RUNNER_TEMP/OHA-M0-macOS.zip"')
+        final_check = mac.index('codesign --verify --deep --strict --verbose=2 "$unpacked"')
+        self.assertLess(sign, checksum)
+        self.assertLess(checksum, archive)
+        self.assertLess(archive, extract)
+        self.assertLess(extract, final_check)
+        self.assertIn('--checksums "$RUNNER_TEMP/OHA-M0-macOS-SHA256SUMS.txt"', mac)
+        self.assertIn('${{ runner.temp }}/OHA-M0-macOS-SHA256SUMS.txt', mac)
+        self.assertNotIn('> SHA256SUMS.txt', mac)
+
     def test_both_events_rebuild_on_compliance_changes(self):
         source = PREVIEW.read_text(encoding="utf-8")
         self.assertIn("  pull_request:\n", source)
