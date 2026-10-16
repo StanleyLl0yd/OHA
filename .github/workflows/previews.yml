@@ -82,10 +82,10 @@ jobs:
           # Do not trim runtime DLLs manually: fail the evidence build instead.
           $resolved = @($parsed.projects | ForEach-Object { $_.frameworks } | ForEach-Object { $_.topLevelPackages; $_.transitivePackages })
           $forbiddenPackages = @($resolved | Where-Object { $_.id -in @("Microsoft.WindowsAppSDK.ML", "Microsoft.WindowsAppSDK.AI") })
-          if ($forbiddenPackages.Count -gt 0) { throw "Unused ML/AI NuGet component is still present in modular WinUI preview: $($forbiddenPackages.id -join \", \")" }
+          if ($forbiddenPackages.Count -gt 0) { throw "Unused ML/AI NuGet component is still present in modular WinUI preview: $($forbiddenPackages.id -join ', ')" }
           $forbiddenNames = @("DirectML.dll", "onnxruntime.dll", "onnxruntime_providers_shared.dll", "Microsoft.Windows.AI.MachineLearning.dll")
           $forbiddenFiles = @(Get-ChildItem -LiteralPath $out -File -Recurse | Where-Object { $_.Name -in $forbiddenNames })
-          if ($forbiddenFiles.Count -gt 0) { throw "Unexpected ML/AI runtime binaries in WinUI-only preview: $($forbiddenFiles.Name -join \", \")" }
+          if ($forbiddenFiles.Count -gt 0) { throw "Unexpected ML/AI runtime binaries in WinUI-only preview: $($forbiddenFiles.Name -join ', ')" }
           Copy-Item -LiteralPath "target/release/oha_ffi.dll" -Destination (Join-Path $out "oha_ffi.dll")
           Copy-Item -LiteralPath "LICENSE" -Destination (Join-Path $out "LICENSE")
           Copy-Item -LiteralPath "THIRD_PARTY_NOTICES.md" -Destination (Join-Path $out "THIRD_PARTY_NOTICES.md")
