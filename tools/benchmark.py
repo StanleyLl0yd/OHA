@@ -148,6 +148,8 @@ def discover(
         files.append(candidate)
         if len(files) > max_files:
             raise ValueError(f"file count exceeds --max-files={max_files}")
+    if not files:
+        raise ValueError("empty benchmark corpus: at least one regular file is required")
     return sorted(files)
 
 
