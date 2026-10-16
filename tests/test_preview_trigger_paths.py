@@ -9,6 +9,18 @@ PREVIEW = ROOT / ".github" / "workflows" / "previews.yml"
 
 
 class PreviewPathTriggerTests(unittest.TestCase):
+    def test_windows_preview_exports_resolved_transitive_nuget_evidence(self):
+        source = PREVIEW.read_text(encoding="utf-8")
+        for fragment in (
+            "dotnet package list --project apps/oha-windows/OHA.Windows.csproj",
+            "--include-transitive --no-restore --format json --output-version 1",
+            "OHA-M0-Windows-x64-nuget.json",
+            "NuGet JSON contained no projects",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, source)
+        self.assertGreaterEqual(source.count("OHA-M0-Windows-x64-nuget.json"), 2)
+
     def test_both_events_rebuild_on_compliance_changes(self):
         source = PREVIEW.read_text(encoding="utf-8")
         self.assertIn("  pull_request:\n", source)
