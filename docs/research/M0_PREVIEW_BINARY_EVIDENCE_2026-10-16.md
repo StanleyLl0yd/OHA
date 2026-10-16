@@ -43,6 +43,14 @@ The sibling `OHA-M0-Windows-x64-nuget.json` reports the following **resolved ref
 
 The actual package also contains `onnxruntime.dll` (21,556,080 bytes), `DirectML.dll` (18,548,584 bytes), `Microsoft.Windows.SDK.NET.dll` (26,341,408 bytes) and the .NET runtime, including `coreclr.dll` and `System.Private.CoreLib.dll`. These are **shipped binary evidence**, not a finding that every referenced package contributes an independent redistributable or that the licenses allow release.
 
+## Preliminary .NET dependency-asset reconciliation
+
+The actual packaged `OHA.Windows.deps.json`, not just the NuGet reference report, declares **13 libraries** under `.NETCoreApp,Version=v10.0/win-x64`. They include `runtimepack.Microsoft.NETCore.App.Runtime.win-x64/10.0.12`, `runtimepack.Microsoft.Windows.SDK.NET.Ref/10.0.26100.57`, `Microsoft.Web.WebView2.Core.Projection/1.0.3179.45`, the OHA application and Windows App SDK packages. These entries provide useful version evidence beyond the top-level NuGet dependency listing.
+
+For a **basename-only**, non-authoritative technical cross-check, all `runtime`, `native`, `runtimeTargets` and `resources` keys were collected from the published `win-x64` dependency target and matched to the 319 heuristic binary candidates in the ZIP inventory. **225** candidate paths had a matching asset basename (including the project-owned `OHA.Windows.dll`), while **94** did not. Examples of *unmatched* packaged binaries are `onnxruntime.dll`, `DirectML.dll`, `CoreMessagingXP.dll` and several WinUI-related `.winmd` or native DLLs. A basename match neither proves provenance nor satisfies license terms; names can collide or be renamed during publication, and `.deps.json` need not list every native resource. The 94 unmatched files require explicit review against the actual Windows App SDK/runtime package payloads.
+
+This mismatch is **not** proof of an illicit or missing component. It shows why neither a NuGet reference list nor `.deps.json` alone is a complete redistribution SBOM, and why Microsoft runtime packs and native payload notices need independent mapping.
+
 ## Unresolved release and acceptance conditions
 
 1. Map the exact 319 candidate paths and all other relevant runtime/resources to their owners, source packages and applicable license/EULA (including component-level Microsoft Windows App SDK, .NET Windows **.NET Library License**, notices, ML/DirectML/ONNX and WebView2 conditions). Separate build-only NuGet references from shipped files.
