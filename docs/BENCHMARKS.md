@@ -31,7 +31,7 @@ The bench harness records input SHA-256, runtime environment and explicit scan/f
 
 ## Independent `.7z` LZMA2 benchmark harness (in validation)
 
-`tools/baseline_7z.py`, described in `docs/BENCHMARK_7Z_M0.md`, uses a real 7-Zip CLI rather than claiming that TAR+XZ is equivalent to 7z. It measures full `.7z` creation, full SHA-256-verified restoration, selective extraction with SHA-256 verification and GNU-time process RSS when available. A separate PR CI workflow installs 7-Zip and records raw artifacts for a small repository text corpus. This is a **tool-validation smoke corpus**, not a performance holdout or OHA comparison. Issue #3 remains open for representative corpora and complete controlled analyses.
+`tools/baseline_7z.py`, described in `docs/BENCHMARK_7Z_M0.md`, uses a real 7-Zip CLI rather than claiming that TAR+XZ is equivalent to 7z. Its source manifest rejects parent traversal and symlinked path components; after each solid/non-solid scenario it rechecks the original file hashes and aborts on changes. This is a trusted-input integrity check, not an atomic snapshot or untrusted archive extractor. It measures full `.7z` creation, full SHA-256-verified restoration, selective extraction with SHA-256 verification and GNU-time process RSS when available. A separate PR CI workflow installs 7-Zip and records raw artifacts for a small repository text corpus. This is a **tool-validation smoke corpus**, not a performance holdout or OHA comparison. Issue #3 remains open for representative corpora and complete controlled analyses.
 
 ## Pinned Canterbury mirror, independent holdout probe (M0)
 
