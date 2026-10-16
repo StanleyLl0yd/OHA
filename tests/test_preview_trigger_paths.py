@@ -24,11 +24,13 @@ class PreviewPathTriggerTests(unittest.TestCase):
     def test_macos_preview_verifies_extracted_signed_bundle_without_mutating_it(self):
         source = PREVIEW.read_text(encoding="utf-8")
         mac = source.split("  macos-preview:", 1)[1]
-        sign = mac.index("codesign --force --deep --sign -")
+        nested_sign = mac.index('codesign --force --sign - "$app/Contents/Frameworks/liboha_ffi.dylib"')
+        sign = mac.index('codesign --force --sign - "$app"')
         checksum = mac.index('> "$RUNNER_TEMP/OHA-M0-macOS-SHA256SUMS.txt"')
         archive = mac.index('ditto -c -k --sequesterRsrc --keepParent')
         extract = mac.index('ditto -x -k "$RUNNER_TEMP/OHA-M0-macOS.zip"')
         final_check = mac.index('codesign --verify --deep --strict --verbose=2 "$unpacked"')
+        self.assertLess(nested_sign, sign)
         self.assertLess(sign, checksum)
         self.assertLess(checksum, archive)
         self.assertLess(archive, extract)
