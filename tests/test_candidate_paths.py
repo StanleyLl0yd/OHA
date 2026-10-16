@@ -37,6 +37,18 @@ class CandidatePathTests(unittest.TestCase):
                 with self.assertRaisesRegex(paths.CandidatePathError, "device"):
                     paths.validate_candidate_path(name)
 
+    def test_windows_console_device_names(self):
+        # Console handles can be opened by CreateFile with these exact names.
+        for name in ("CONIN$", "conout$", "CoNiN$", "a/CONOUT$",
+                     "CLOCK$", "clock$.txt", "directory/CLOCK$.data"):
+            with self.subTest(name=name):
+                with self.assertRaisesRegex(paths.CandidatePathError, "device"):
+                    paths.validate_candidate_path(name)
+
+    def test_console_name_with_extension_is_not_special(self):
+        # Unlike CON.txt, CONIN$.txt is not a Windows console handle.
+        self.assertEqual(paths.validate_candidate_path("CONIN$.txt"), "CONIN$.txt")
+
     def test_forbidden_windows_characters_and_ads(self):
         for name in ('file:stream', 'a<b', 'a>b', 'foo|bar', 'test?.md', 'x*y', 'a"b',
                      "a\x00b", "a\x1fb", "a\x7fb"):

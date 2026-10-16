@@ -8,8 +8,8 @@ Repository: https://github.com/StanleyLl0yd/OHA (public).
 - 44 original scaffold files plus subsequent CI fixes, lockfile and documentation.
 - Six focused M0 issues: #2 through #7.
 
-The imported `.oha` binary framing is an unapproved proposal, not an implemented archival format. No repository LICENSE has been selected. Public visibility does not grant an open-source license.
+The imported `.oha` binary framing is an unapproved proposal, not an implemented archival format. At the *initial bootstrap snapshot* the repository did not yet have an approved source license; **later on 2026-10-14 the owner approved MPL-2.0**, now committed as root `LICENSE` and recorded in ADR-0004. Repository visibility alone would not have granted permission to use the source before the license decision.
 
-Before completing M0, ensure owner-approved license and codec policy, real benchmarking baselines, Windows/macOS native GUI/FFI builds, reviewed wire format, and mandatory two-pass complete-repository audit. See `docs/ROADMAP.md` and `AGENTS.md`.
+Before completing M0, ensure **separate third-party binary redistribution clearance** (the project source license is already approved), defensible benchmarking, physical GUI acceptance in addition to native CI builds, owner-reviewed wire format and mandatory two-pass complete-repository audit. See `docs/ROADMAP.md` and `AGENTS.md`.
 
 Protect `main` after the CI job names stabilize. Never bypass failing checks merely to merge.

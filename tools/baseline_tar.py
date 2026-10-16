@@ -7,7 +7,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import platform
+import random
 import shutil
+import subprocess
 import tarfile
 import tempfile
 import time
@@ -59,6 +62,19 @@ def verify_tar(tar_path: Path, source: Path, files: list[Path]) -> None:
         raise RuntimeError("tar has missing entries")
 
 
+
+def codec_version(executable: str) -> str:
+    """Capture the actual codec CLI banner (including stderr-only tools)."""
+    result = subprocess.run([executable, "--version"], capture_output=True,
+                            text=True, timeout=15, check=False)
+    if result.returncode != 0:
+        raise RuntimeError(f"cannot identify {executable} version")
+    for line in (result.stdout + "\n" + result.stderr).splitlines():
+        if line.strip():
+            return line.strip()[:250]
+    raise RuntimeError(f"empty {executable} version banner")
+
+
 def measure_directory(source: Path, files: list[Path], repetitions: int = 3) -> dict:
     if repetitions < 1 or repetitions > 20:
         raise ValueError("invalid repetitions")
@@ -70,11 +86,16 @@ def measure_directory(source: Path, files: list[Path], repetitions: int = 3) -> 
     }.items() if shutil.which(args[0][0])}
     if not coders:
         raise RuntimeError("neither zstd nor xz available")
+    versions = {encoder[0]: codec_version(encoder[0])
+                for encoder, _ in coders.values()}
+    plan = [(n, name) for n in range(1, repetitions + 1)
+            for name in coders]
+    random.Random(271828).shuffle(plan)
     records = []
     with tempfile.TemporaryDirectory(prefix="oha-tar-baseline-") as directory:
         tmp = Path(directory)
-        for run in range(repetitions):
-            for name, (encoder, decoder) in coders.items():
+        for order, (repetition, name) in enumerate(plan, 1):
+                encoder, decoder = coders[name]
                 packed_tar = tmp / "input.tar"
                 compressed = tmp / "packed.out"
                 restored_tar = tmp / "restored.tar"
@@ -88,7 +109,8 @@ def measure_directory(source: Path, files: list[Path], repetitions: int = 3) -> 
                 started = time.perf_counter()
                 verify_tar(restored_tar, source, files)
                 verify_ms = (time.perf_counter() - started) * 1000
-                records.append({"codec": name, "repetition": run + 1,
+                records.append({"codec": name, "repetition": repetition,
+                                "order_position": order,
                                 "tar_bytes": packed_tar.stat().st_size,
                                 "compressed_bytes": compressed.stat().st_size,
                                 "tar_build_ms": round(tar_ms, 3),
@@ -97,8 +119,13 @@ def measure_directory(source: Path, files: list[Path], repetitions: int = 3) -> 
                                 "verify_ms": round(verify_ms, 3),
                                 "status": "sha256-verified"})
     return {"schema_version": 1, "kind": "deterministic_tar_baseline_NOT_oha_or_7z",
-            "notes": "Sequential reps. No RSS/random-file extraction/cold cache controls."
+            "notes": "Reproducibly shuffled codec/repetition order. No RSS/random-file extraction/cold cache controls."
                      " End-to-end package+encode = tar_build_ms + encode_ms.",
+            "method": {"run_order_seed": 271828, "repetitions": repetitions,
+                       "cache_control": "uncontrolled warm/variable", "threads": 1},
+            "environment": {"os": platform.platform(), "machine": platform.machine(),
+                            "python": platform.python_version()},
+            "tool_versions": versions,
             "input_files": [{"path": f.relative_to(source).as_posix(),
                              "size": f.stat().st_size, "sha256": benchmark.hash_file(f)} for f in files],
             "runs": records}
