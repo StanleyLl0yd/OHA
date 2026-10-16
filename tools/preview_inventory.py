@@ -13,6 +13,7 @@ import re
 MAX_ENTRIES = 20_000
 MAX_TOTAL_BYTES = 2 * 1024**3
 MAX_DEPS_BYTES = 16 * 1024**2
+MAX_CHECKSUM_BYTES = 8 * 1024**2
 GITHUB_SOURCE = "https://github.com/StanleyLl0yd/OHA/tree/"
 HEX_SHA = re.compile(r"^[0-9a-f]{40}$")
 CHECKSUM_LINE = re.compile(r"^([0-9a-fA-F]{64})[ ]+\*?(.+)$")
@@ -31,7 +32,8 @@ def digest(path: Path) -> str:
     return sha.hexdigest()
 
 
-def inventory(root: Path, platform: str, source_commit: str) -> dict:
+def inventory(root: Path, platform: str, source_commit: str, *,
+              checksum_manifest: Path | None = None) -> dict:
     if platform not in OWN_BINARIES:
         raise ValueError("platform must be windows or macos")
     if not HEX_SHA.fullmatch(source_commit):
@@ -70,11 +72,26 @@ def inventory(root: Path, platform: str, source_commit: str) -> dict:
     if not (root / (prefix + "THIRD_PARTY_NOTICES.md")).read_text(encoding="utf-8").strip():
         raise ValueError("third-party inventory notice empty")
 
-    checksum_file = root / ("Contents/SHA256SUMS.txt" if platform == "macos" else "SHA256SUMS.txt")
-    checked = []
+    if platform == "macos":
+        if checksum_manifest is None:
+            raise ValueError("macOS requires external checksum manifest")
+        if (checksum_manifest.is_symlink() or not checksum_manifest.is_file() or
+                checksum_manifest.resolve().is_relative_to(root.resolve())):
+            raise ValueError("macOS checksum manifest must be a real file outside signed app")
+        if "Contents/SHA256SUMS.txt" in files:
+            raise ValueError("signed macOS bundle must not contain a post-signing checksum file")
+        checksum_file = checksum_manifest
+        base = ""
+    else:
+        if checksum_manifest is not None:
+            raise ValueError("Windows checksum manifest is inside the preview folder")
+        checksum_file = root / "SHA256SUMS.txt"
+        base = ""
     if not checksum_file.is_file():
         raise ValueError("SHA256SUMS.txt missing")
-    base = "Contents/" if platform == "macos" else ""
+    if checksum_file.stat().st_size > MAX_CHECKSUM_BYTES:
+        raise ValueError("SHA256SUMS.txt resource budget")
+    checked = []
     for line in checksum_file.read_text(encoding="utf-8-sig").splitlines():
         if not line.strip():
             continue
@@ -86,11 +103,9 @@ def inventory(root: Path, platform: str, source_commit: str) -> dict:
         if rel in checked or rel not in files or record_sha.lower() != files[rel]["sha256"]:
             raise ValueError(f"SHA256SUMS mismatch or duplicate: {name}")
         checked.append(rel)
-    if not checked or (platform == "windows" and
-                       set(checked) != set(files) - {"SHA256SUMS.txt"}):
+    expected = set(files) - ({"SHA256SUMS.txt"} if platform == "windows" else set())
+    if set(checked) != expected:
         raise ValueError("SHA256SUMS incomplete")
-    if platform == "macos" and not OWN_BINARIES["macos"].issubset(set(checked)):
-        raise ValueError("macOS binary checksums incomplete")
 
     deps = {}
     for rel in files:
@@ -130,11 +145,14 @@ def main() -> int:
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--platform", choices=("windows", "macos"), required=True)
     parser.add_argument("--commit", required=True)
+    parser.add_argument("--checksums", type=Path,
+                        help="Required external SHA256SUMS.txt for macOS (outside signed .app)")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.output.resolve().is_relative_to(args.root.resolve()):
         parser.error("inventory output must be outside inspected directory")
-    result = inventory(args.root, args.platform, args.commit)
+    result = inventory(args.root, args.platform, args.commit,
+                       checksum_manifest=args.checksums)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(f"Preview manifest PASS: {result['file_count']} files, "
