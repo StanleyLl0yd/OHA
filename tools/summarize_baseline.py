@@ -25,7 +25,8 @@ class BaselineSummaryError(ValueError):
 
 
 def numeric(value, field: str):
-    if type(value) not in (int, float) or not math.isfinite(value) or value < 0:
+    if (type(value) not in (int, float) or value < 0 or value > (1 << 63) - 1
+            or (type(value) is float and not math.isfinite(value))):
         raise BaselineSummaryError("invalid nonnegative metric: " + field)
     return value
 
@@ -47,7 +48,8 @@ def describe(samples: list, name: str):
 
 
 def summarize(report: dict) -> dict:
-    if type(report) is not dict or report.get("schema_version") != 1:
+    if (type(report) is not dict or type(report.get("schema_version")) is not int
+            or report["schema_version"] != 1):
         raise BaselineSummaryError("unsupported baseline report version")
     kind = report.get("kind")
     if kind not in METRICS:
